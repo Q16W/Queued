@@ -1,0 +1,15 @@
+# Cloudflare Pages headers
+/*
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: clipboard-write=(self)
+
+# Let the HTML revalidate so releases show up; cache static assets hard.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/icon-*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/manifest.json
+  Cache-Control: public, max-age=0, must-revalidate
