@@ -36,6 +36,10 @@
     .rk-clamp4 { display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0 }
     input[type=number] { -moz-appearance:textfield }
+    .rk-hue { -webkit-appearance:none; appearance:none; height:16px; border-radius:999px; outline:none; cursor:pointer;
+      background:linear-gradient(to right,#ff5a5a 0%,#ffd24e 17%,#7cf04e 33%,#4ee0c8 50%,#5aa8ff 67%,#b06bff 83%,#ff5ad0 100%); }
+    .rk-hue::-webkit-slider-thumb { -webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:#fff; border:3px solid #15151A; box-shadow:0 1px 5px rgba(0,0,0,0.5); cursor:pointer; }
+    .rk-hue::-moz-range-thumb { width:24px; height:24px; border-radius:50%; background:#fff; border:3px solid #15151A; box-shadow:0 1px 5px rgba(0,0,0,0.5); cursor:pointer; }
     html,body { margin:0; height:100%; background:#000; overscroll-behavior:none; }
     /* Auto-frame: full-bleed on phones; floating app column on tablet/desktop. */
     @media (min-width:620px){
@@ -52,7 +56,12 @@
   <div class="rk-scroll" style="position:absolute; top:0; left:0; right:0; bottom:80px; overflow-y:auto;">
     <div style="position:sticky; top:0; z-index:20; background:#0D0D10; padding:58px 18px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
       <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:12px;">
-        <div style="font-family:'Space Grotesk'; font-weight:700; font-size:30px; letter-spacing:-0.045em; line-height:1;">queu<span style="color:var(--accent);">ed</span></div>
+        <div style="display:flex; align-items:center; gap:11px;">
+          <div style="font-family:'Space Grotesk'; font-weight:700; font-size:30px; letter-spacing:-0.045em; line-height:1;">queu<span style="color:var(--accent);">ed</span></div>
+          <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onOpenSignIn }}" style="display:flex; align-items:center; gap:5px; padding:6px 13px; background:var(--accent); color:#0D0D10; border-radius:999px; font-family:'Hanken Grotesk'; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent);"><i class="ti ti-user" style="font-size:13px;"></i>Sign in</div>
+          </sc-if>
+        </div>
         <div style="font-family:'Space Mono'; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#5A5A63; padding-bottom:3px;">{{ libCountText }}</div>
       </div>
       <sc-if value="{{ libHas }}" hint-placeholder-val="{{ true }}">
@@ -239,7 +248,7 @@
 
   <!-- ════════ DISCOVER ════════ -->
   <sc-if value="{{ isDiscover }}" hint-placeholder-val="{{ false }}">
-  <div class="rk-scroll" style="position:absolute; top:0; left:0; right:0; bottom:80px; overflow-y:auto;">
+  <div class="rk-scroll" onScroll="{{ onDiscoverScroll }}" style="position:absolute; top:0; left:0; right:0; bottom:80px; overflow-y:auto;">
     <!-- sticky header -->
     <div style="position:sticky; top:0; z-index:20; background:#0D0D10; padding:58px 18px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
       <div style="font-family:'Space Grotesk'; font-weight:700; font-size:27px; letter-spacing:-0.035em; margin-bottom:11px;">Discover</div>
@@ -294,6 +303,9 @@
             <sc-if value="{{ genreResultsEmpty }}" hint-placeholder-val="{{ false }}">
               <div style="text-align:center; padding:50px 24px; color:#8E8E98; font-size:14px; line-height:1.5;">No titles match all of those filters together. Try removing one.</div>
             </sc-if>
+            <sc-if value="{{ discGenreLoadingMore }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:center; justify-content:center; padding:24px 0;"><div style="width:22px; height:22px; border-radius:50%; border:3px solid rgba(255,255,255,0.12); border-top-color:var(--accent); animation:rk-spin .8s linear infinite;"></div></div>
+            </sc-if>
           </sc-if>
         </div>
       </sc-if>
@@ -318,6 +330,9 @@
             </sc-for>
             <sc-if value="{{ resultsEmpty }}" hint-placeholder-val="{{ false }}">
               <div style="text-align:center; padding:60px 0; color:#8E8E98; font-size:14px;">No results found.</div>
+            </sc-if>
+            <sc-if value="{{ discResultsLoadingMore }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:center; justify-content:center; padding:22px 0;"><div style="width:22px; height:22px; border-radius:50%; border:3px solid rgba(255,255,255,0.12); border-top-color:var(--accent); animation:rk-spin .8s linear infinite;"></div></div>
             </sc-if>
             <sc-if value="{{ searchNeedsKey }}" hint-placeholder-val="{{ false }}">
               <div style="text-align:center; padding:46px 24px; color:#8E8E98; font-size:13.5px; line-height:1.55; display:flex; flex-direction:column; align-items:center; gap:13px;">
@@ -547,6 +562,17 @@
       <div onClick="{{ onOpenFeedSettings }}" style="width:38px; height:38px; border-radius:50%; background:#17171C; border:1px solid rgba(255,255,255,0.10); display:flex; align-items:center; justify-content:center; color:#C7C7CE; cursor:pointer;"><i class="ti ti-settings" style="font-size:19px;"></i></div>
     </div>
     <div style="padding:8px 12px 24px;">
+      <sc-if value="{{ feedSetupShow }}" hint-placeholder-val="{{ false }}">
+        <div style="margin:8px 4px 6px; padding:16px; border-radius:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); position:relative;">
+          <div onClick="{{ onDismissFeedSetup }}" style="position:absolute; top:11px; right:12px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="ti ti-x" style="font-size:15px; color:#8E8E98;"></i></div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;"><i class="ti ti-adjustments-horizontal" style="font-size:18px; color:var(--accent);"></i><span style="font-size:15px; font-weight:700;">Make this feed yours</span></div>
+          <div style="font-size:12.5px; color:#8E8E98; line-height:1.5; margin-bottom:13px; padding-right:18px;">Pick the kinds of releases you actually want to see — anime, movies, TV, or any mix. You're currently following <span style="color:#C7C7CE; font-weight:600;">{{ feedSummaryText }}</span>.</div>
+          <div style="display:flex; gap:9px;">
+            <div onClick="{{ onOpenFeedSetup }}" style="flex:1; text-align:center; padding:11px; background:var(--accent); color:#0D0D10; border-radius:11px; font-family:'Hanken Grotesk'; font-size:13.5px; font-weight:700; cursor:pointer;">Choose content</div>
+            <div onClick="{{ onDismissFeedSetup }}" style="flex:none; text-align:center; padding:11px 16px; background:transparent; color:#8E8E98; border:1px solid rgba(255,255,255,0.14); border-radius:11px; font-family:'Hanken Grotesk'; font-size:13.5px; font-weight:600; cursor:pointer;">Looks good</div>
+          </div>
+        </div>
+      </sc-if>
       <sc-if value="{{ feedLoading }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 0; gap:14px;">
           <div style="width:30px; height:30px; border-radius:50%; border:3px solid rgba(255,255,255,0.12); border-top-color:var(--accent); animation:rk-spin .8s linear infinite;"></div>
@@ -607,7 +633,14 @@
         <div style="font-size:13px; color:#8E8E98; margin-top:8px;">{{ libCountText }}</div>
       </sc-if>
       <sc-if value="{{ accountProfile }}" hint-placeholder-val="{{ false }}">
-        <div style="width:82px; height:82px; border-radius:50%; background:linear-gradient(150deg,#D4F84A,#A9D119); border:2px solid rgba(200,240,60,0.35); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:36px; color:#0D0D10; margin:0 auto 8px;">{{ accountInitial }}</div>
+        <div onClick="{{ onAvatarTap }}" style="cursor:pointer; width:82px; height:82px; border-radius:50%; background:rgba(200,240,60,0.11); border:2px solid rgba(200,240,60,0.35); display:flex; align-items:center; justify-content:center; font-size:38px; margin:0 auto 6px;">{{ profileEmoji }}</div>
+        <sc-if value="{{ profileEmojiPicking }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; gap:6px; justify-content:center; margin:6px 0 8px; background:#15151A; padding:10px 14px; border-radius:14px; border:1px solid rgba(255,255,255,0.08);">
+            <sc-for list="{{ emojiOptions }}" as="eo">
+              <div onClick="{{ eo.onSelect }}" style="font-size:26px; cursor:pointer; padding:3px 5px; border-radius:8px; background:{{ eo.bg }};">{{ eo.em }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
         <div style="display:inline-flex; align-items:center; gap:7px;">
           <span style="font-family:'Space Grotesk'; font-weight:700; font-size:21px; letter-spacing:-0.03em;">{{ accountName }}</span>
         </div>
@@ -778,14 +811,6 @@
           </sc-if>
         </div>
       </div>
-      <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:15px 16px;">
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;"><i class="ti ti-language" style="font-size:15px; color:var(--accent);"></i><span style="font-size:14px; font-weight:700;">Title language</span></div>
-        <div style="display:flex; gap:7px;">
-          <span onClick="{{ lang.romaji.on }}" style="flex:1; text-align:center; padding:8px 4px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; background:{{ lang.romaji.bg }}; color:{{ lang.romaji.fg }}; border:1px solid {{ lang.romaji.bd }};">Romaji</span>
-          <span onClick="{{ lang.english.on }}" style="flex:1; text-align:center; padding:8px 4px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; background:{{ lang.english.bg }}; color:{{ lang.english.fg }}; border:1px solid {{ lang.english.bd }};">English</span>
-          <span onClick="{{ lang.native.on }}" style="flex:1; text-align:center; padding:8px 4px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; background:{{ lang.native.bg }}; color:{{ lang.native.fg }}; border:1px solid {{ lang.native.bd }};">Native</span>
-        </div>
-      </div>
       <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden;">
         <div style="padding:14px 16px; font-size:14px; font-weight:700; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:baseline; gap:9px;"><i class="ti ti-chart-dots" style="font-size:15px; color:var(--accent);"></i>Score distribution <span style="font-family:'Space Grotesk'; color:var(--accent); font-size:15px;">avg {{ avgText }}</span></div>
         <sc-if value="{{ hasRated }}" hint-placeholder-val="{{ true }}">
@@ -817,8 +842,8 @@
     <div onClick="{{ nav.library.on }}" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:{{ nav.library.color }};"><i class="ti ti-stack-2" style="font-size:23px;"></i><span style="font-size:10px; font-weight:600; letter-spacing:0.01em;">Library</span></div>
     <div onClick="{{ nav.discover.on }}" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:{{ nav.discover.color }};"><i class="ti ti-compass" style="font-size:23px;"></i><span style="font-size:10px; font-weight:600; letter-spacing:0.01em;">Discover</span></div>
     <div onClick="{{ onOpenGameMenu }}" style="flex:none; width:66px; display:flex; flex-direction:column; align-items:center; cursor:pointer;">
-      <div style="width:52px; height:52px; margin-top:-26px; border-radius:50%; background:linear-gradient(150deg,#D4F84A,#A9D119); box-shadow:0 8px 22px rgba(200,240,60,0.45), 0 0 0 4px #0D0D10; border:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; color:#0D0D10;"><i class="ti ti-swords" style="font-size:27px;"></i></div>
-      <span style="font-size:10px; font-weight:700; letter-spacing:0.01em; color:#C8F03C; margin-top:4px;">Rank</span>
+      <div style="width:52px; height:52px; margin-top:-26px; border-radius:50%; background:var(--accent); box-shadow:0 8px 22px color-mix(in srgb, var(--accent) 45%, transparent), 0 0 0 4px #0D0D10; border:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; color:#0D0D10;"><i class="ti ti-swords" style="font-size:27px;"></i></div>
+      <span style="font-size:10px; font-weight:700; letter-spacing:0.01em; color:var(--accent); margin-top:4px;">Rank</span>
     </div>
     <div onClick="{{ nav.feed.on }}" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:{{ nav.feed.color }};"><i class="ti ti-broadcast" style="font-size:23px;"></i><span style="font-size:10px; font-weight:600; letter-spacing:0.01em;">Feed</span></div>
     <div onClick="{{ nav.profile.on }}" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:{{ nav.profile.color }};"><i class="ti ti-user-circle" style="font-size:23px;"></i><span style="font-size:10px; font-weight:600; letter-spacing:0.01em;">Profile</span></div>
@@ -1531,6 +1556,18 @@
             </div>
           </sc-for>
         </div>
+        <label style="display:flex; align-items:center; gap:12px; margin-top:14px; padding:13px 14px; background:#15151A; border:1px solid {{ accentCustomBd }}; border-radius:13px;">
+          <div style="width:34px; height:34px; border-radius:10px; flex:none; background:var(--accent); border:2px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center;"><sc-if value="{{ accentIsCustom }}" hint-placeholder-val="{{ false }}"><i class="ti ti-check" style="color:#0D0D10; font-size:18px;"></i></sc-if></div>
+          <div style="flex:1;"><div style="font-size:14px; font-weight:600;">Custom colour</div><div style="font-family:'Space Mono'; font-size:11px; color:#8E8E98; margin-top:2px;">{{ accentHexLabel }}</div></div>
+        </label>
+        <div style="margin-top:10px; padding:16px 15px 15px; background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:13px;">
+          <input type="range" min="0" max="359" value="{{ accentHue }}" onInput="{{ onHueInput }}" class="rk-hue" style="width:100%; box-sizing:border-box; display:block; margin:0;" />
+          <div style="display:flex; gap:7px; margin-top:14px;">
+            <sc-for list="{{ accentShades }}" as="sh">
+              <div onClick="{{ sh.on }}" style="flex:1; height:32px; border-radius:9px; background:{{ sh.color }}; cursor:pointer; border:2px solid {{ sh.border }};"></div>
+            </sc-for>
+          </div>
+        </div>
       </div>
     </div>
   </sc-if>
@@ -1540,8 +1577,9 @@
     <div onClick="{{ onCloseGameMenu }}" style="position:absolute; inset:0; z-index:260; background:rgba(0,0,0,0.62); display:flex; align-items:flex-end; animation:rk-in .18s ease;">
       <div onClick="{{ stopProp }}" style="width:100%; box-sizing:border-box; background:#1A1A1F; border-radius:22px 22px 0 0; border:1px solid rgba(200,240,60,0.18); border-bottom:none; padding:18px 18px 30px;">
         <div style="width:36px; height:4px; border-radius:2px; background:#3A3A43; margin:0 auto 18px;"></div>
-        <div style="display:flex; align-items:center; gap:9px; margin-bottom:4px;"><i class="ti ti-swords" style="font-size:20px; color:#C8F03C;"></i><span style="font-family:'Space Grotesk'; font-weight:700; font-size:19px;">Rating game</span></div>
-        <div style="font-size:12.5px; color:#8E8E98; line-height:1.5; margin-bottom:16px;">Head-to-head matchups that fine-tune every score relative to each other.</div>
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:4px;"><i class="ti ti-swords" style="font-size:20px; color:#C8F03C;"></i><span style="font-family:'Space Grotesk'; font-weight:700; font-size:19px; flex:1;">Rating game</span><div onClick="{{ onOpenGameTypes }}" style="width:34px; height:34px; border-radius:999px; background:#15151A; border:1px solid rgba(255,255,255,0.10); display:flex; align-items:center; justify-content:center; color:#C7C7CE; cursor:pointer; flex:none;"><i class="ti ti-settings" style="font-size:18px;"></i></div></div>
+        <div style="font-size:12.5px; color:#8E8E98; line-height:1.5; margin-bottom:14px;">Head-to-head matchups that fine-tune every score relative to each other.</div>
+        <div onClick="{{ onOpenGameTypes }}" style="display:flex; align-items:center; gap:8px; margin-bottom:16px; padding:9px 12px; background:rgba(255,255,255,0.04); border-radius:11px; cursor:pointer;"><i class="ti ti-stack-2" style="font-size:15px; color:#C8F03C;"></i><span style="flex:1; font-size:12.5px; color:#C7C7CE; font-weight:500;">Comparing: {{ gtSummary }}</span><i class="ti ti-chevron-right" style="font-size:15px; color:#5A5A63;"></i></div>
         <sc-if value="{{ canPlayGame }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex; gap:10px;">
           <div onClick="{{ onMenuPlayDaily }}" style="flex:1; background:#15151A; border:1px solid rgba(200,240,60,0.22); border-radius:14px; padding:15px 13px; cursor:pointer;">
@@ -1562,6 +1600,23 @@
           <div style="font-size:13.5px; color:#8E8E98; line-height:1.5; max-width:240px;">Smart-rate at least 2 titles in your library to start playing.</div>
         </div>
         </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ════════ RATING GAME MEDIA-TYPE SHEET ════════ -->
+  <sc-if value="{{ gameTypesOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseGameTypes }}" style="position:absolute; inset:0; z-index:280; background:rgba(0,0,0,0.62); display:flex; align-items:flex-end; animation:rk-in .18s ease;">
+      <div onClick="{{ stopProp }}" style="width:100%; box-sizing:border-box; background:#1A1A1F; border-radius:22px 22px 0 0; border:1px solid rgba(200,240,60,0.18); border-bottom:none; padding:18px 18px 30px;">
+        <div style="width:36px; height:4px; border-radius:2px; background:#3A3A43; margin:0 auto 18px;"></div>
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:4px;"><i class="ti ti-stack-2" style="font-size:20px; color:#C8F03C;"></i><span style="font-family:'Space Grotesk'; font-weight:700; font-size:19px;">What to compare</span></div>
+        <div style="font-size:12.5px; color:#8E8E98; line-height:1.5; margin-bottom:16px;">Pick which media types show up in rating-game matchups. Only titles you've smart-rated are eligible.</div>
+        <div style="display:flex; gap:9px;">
+          <div onClick="{{ onToggleGtAnime }}" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px; padding:15px 8px; border-radius:14px; cursor:pointer; background:{{ gtAnimePill.bg }}; color:{{ gtAnimePill.fg }}; border:1.5px solid {{ gtAnimePill.bd }}; transition:background .15s, border-color .15s;"><i class="ti ti-broadcast" style="font-size:23px;"></i><span style="font-size:13px; font-weight:700; font-family:'Hanken Grotesk';">Anime</span></div>
+          <div onClick="{{ onToggleGtMovie }}" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px; padding:15px 8px; border-radius:14px; cursor:pointer; background:{{ gtMoviePill.bg }}; color:{{ gtMoviePill.fg }}; border:1.5px solid {{ gtMoviePill.bd }}; transition:background .15s, border-color .15s;"><i class="ti ti-movie" style="font-size:23px;"></i><span style="font-size:13px; font-weight:700; font-family:'Hanken Grotesk';">Movies</span></div>
+          <div onClick="{{ onToggleGtTv }}" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px; padding:15px 8px; border-radius:14px; cursor:pointer; background:{{ gtTvPill.bg }}; color:{{ gtTvPill.fg }}; border:1.5px solid {{ gtTvPill.bd }}; transition:background .15s, border-color .15s;"><i class="ti ti-device-tv" style="font-size:23px;"></i><span style="font-size:13px; font-weight:700; font-family:'Hanken Grotesk';">TV shows</span></div>
+        </div>
+        <div style="font-size:11.5px; color:#5A5A63; line-height:1.5; margin-top:12px; display:flex; align-items:flex-start; gap:7px;"><i class="ti ti-info-circle" style="font-size:13px; margin-top:1px;"></i><span>Turning a type off keeps it out of matchups but never changes its scores.</span></div>
       </div>
     </div>
   </sc-if>
@@ -1600,7 +1655,7 @@
         <div style="font-size:12.5px; color:#8E8E98; margin:0 4px 14px;">Choose what shows up in your feed.</div>
         <div onClick="{{ onFeedTypeAll }}" style="display:flex; align-items:center; gap:12px; padding:14px; border-radius:13px; background:#15151A; border:1px solid {{ feedTypeAllBd }}; margin-bottom:9px; cursor:pointer;">
           <i class="ti ti-broadcast" style="font-size:19px; color:{{ feedTypeAllFg }};"></i>
-          <div style="flex:1;"><div style="font-size:14.5px; font-weight:600; color:{{ feedTypeAllFg }};">All airing</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Popular anime currently airing</div></div>
+          <div style="flex:1;"><div style="font-size:14.5px; font-weight:600; color:{{ feedTypeAllFg }};">All airing</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Popular titles currently airing &amp; in theaters</div></div>
           <sc-if value="{{ feedTypeAllOn }}" hint-placeholder-val="{{ true }}"><i class="ti ti-check" style="font-size:18px; color:var(--accent);"></i></sc-if>
         </div>
         <div onClick="{{ onFeedTypeWatchlist }}" style="display:flex; align-items:center; gap:12px; padding:14px; border-radius:13px; background:#15151A; border:1px solid {{ feedTypeWatchBd }}; cursor:pointer;">
@@ -1608,7 +1663,21 @@
           <div style="flex:1;"><div style="font-size:14.5px; font-weight:600; color:{{ feedTypeWatchFg }};">My watchlist</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Only airing titles in your library</div></div>
           <sc-if value="{{ feedTypeWatchOn }}" hint-placeholder-val="{{ false }}"><i class="ti ti-check" style="font-size:18px; color:var(--accent);"></i></sc-if>
         </div>
-        <div onClick="{{ onOpenSettingsFromFeed }}" style="display:flex; align-items:center; gap:10px; padding:13px 14px; margin-top:14px; border-radius:13px; background:rgba(255,255,255,0.04); cursor:pointer;"><i class="ti ti-bell" style="font-size:17px; color:#8E8E98;"></i><span style="flex:1; font-size:13.5px; font-weight:500; color:#C7C7CE;">Notification settings</span><i class="ti ti-chevron-right" style="color:#5A5A63;"></i></div>
+        <div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:18px 4px 8px;">Show in feed</div>
+        <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:13px; overflow:hidden;">
+          <div onClick="{{ onToggleFeedAnime }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06);"><i class="ti ti-broadcast" style="font-size:18px; color:var(--accent); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">Anime</span><div style="width:40px; height:23px; border-radius:999px; background:{{ feedAnimeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ feedAnimeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+          <div onClick="{{ onToggleFeedMovie }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06);"><i class="ti ti-movie" style="font-size:18px; color:var(--tc-film); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">Movies</span><div style="width:40px; height:23px; border-radius:999px; background:{{ feedMovieBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ feedMovieKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+          <div onClick="{{ onToggleFeedTv }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer;"><i class="ti ti-device-tv" style="font-size:18px; color:var(--tc-tv); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">TV shows</span><div style="width:40px; height:23px; border-radius:999px; background:{{ feedTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ feedTvKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+        </div>
+        <sc-if value="{{ feedMediaNeedsTmdb }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#E8A33A; line-height:1.5; margin-top:9px; display:flex; align-items:flex-start; gap:7px; padding:0 2px;"><i class="ti ti-alert-triangle" style="font-size:13px; margin-top:1px;"></i><span>Connect TMDB in Settings to pull movies &amp; TV into your feed.</span></div></sc-if>
+        <div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:18px 4px 8px;">Notify me about</div>
+        <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:13px; overflow:hidden;">
+          <div onClick="{{ onToggleNotifAnime }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06);"><i class="ti ti-broadcast" style="font-size:18px; color:var(--accent); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">Anime</span><div style="width:40px; height:23px; border-radius:999px; background:{{ notifMediaAnimeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifMediaAnimeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+          <div onClick="{{ onToggleNotifMovie }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06);"><i class="ti ti-movie" style="font-size:18px; color:var(--tc-film); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">Movies</span><div style="width:40px; height:23px; border-radius:999px; background:{{ notifMediaMovieBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifMediaMovieKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+          <div onClick="{{ onToggleNotifTv }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer;"><i class="ti ti-device-tv" style="font-size:18px; color:var(--tc-tv); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">TV shows</span><div style="width:40px; height:23px; border-radius:999px; background:{{ notifMediaTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifMediaTvKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+        </div>
+        <div style="font-size:11px; color:#5A5A63; line-height:1.5; margin-top:9px; padding:0 2px;">Only get release &amp; episode alerts for the types you care about.</div>
+        <div onClick="{{ onOpenSettingsFromFeed }}" style="display:flex; align-items:center; gap:10px; padding:13px 14px; margin-top:14px; border-radius:13px; background:rgba(255,255,255,0.04); cursor:pointer;"><i class="ti ti-bell" style="font-size:17px; color:#8E8E98;"></i><span style="flex:1; font-size:13.5px; font-weight:500; color:#C7C7CE;">More notification settings</span><i class="ti ti-chevron-right" style="color:#5A5A63;"></i></div>
       </div>
     </div>
   </sc-if>
@@ -1653,20 +1722,22 @@
           </div>
         </sc-if>
       </sc-if>
-      <!-- AniList first-open prompt -->
-      <sc-if value="{{ anilistPromptShow }}" hint-placeholder-val="{{ false }}">
-        <div style="background:linear-gradient(150deg, rgba(45,123,182,0.18), rgba(45,123,182,0.04)); border:1px solid rgba(80,160,220,0.28); border-radius:16px; padding:16px; margin-bottom:14px; position:relative;">
-          <div onClick="{{ onDismissAnilistPrompt }}" style="position:absolute; top:11px; right:12px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="ti ti-x" style="font-size:15px; color:#8E8E98;"></i></div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;"><i class="ti ti-brand-anilist" style="font-size:19px; color:#5BA8E0;"></i><span style="font-size:15px; font-weight:700;">Connect your AniList</span></div>
-          <div style="font-size:12.5px; color:#8E8E98; line-height:1.5; margin-bottom:13px; padding-right:18px;">Import your anime list, scores and progress, and keep them in sync. You can always do this later below.</div>
-          <div onClick="{{ onSignInAnilist }}" style="text-align:center; padding:12px; background:#2D7BB6; color:#fff; border-radius:12px; font-family:'Hanken Grotesk'; font-size:14px; font-weight:700; cursor:pointer;">Connect AniList</div>
-        </div>
-      </sc-if>
       <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;"><div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-shield-lock" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Content &amp; maturity</span></div><div onClick="{{ onToggleAdult18 }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-circle-letter-r" style="font-size:18px; color:{{ adult18Color }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Show 18+ content</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Unlocks sexual tags &amp; adult titles</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ adult18Bg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adult18Knob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><sc-if value="{{ adult18 }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:8px 16px 2px 22px;">Show adult titles in</div><div onClick="{{ onToggleAdultAnime }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-broadcast" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Anime</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultAnimeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultAnimeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultMovies }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-movie" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Movies</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultMoviesBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultMoviesKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultTv }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-device-tv" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">TV shows</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultTvKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-if><sc-if value="{{ adultLocked }}" hint-placeholder-val="{{ true }}"><div style="padding:10px 16px 14px; font-size:11.5px; color:#5A5A63; line-height:1.5; border-top:1px solid rgba(255,255,255,0.05);">Sexual tags and adult titles stay hidden across Discover &amp; Library until you turn this on.</div></sc-if></div>
       <div style="height:14px;"></div>
       <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;">
-        <div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-swords" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Rating games</span></div>
-        <div onClick="{{ onToggleCompareAnimeTv }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-arrows-shuffle" style="font-size:18px; color:{{ compareAnimeTvColor }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Compare anime with TV shows</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Match anime against live-action TV in would-you-rather games</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ compareAnimeTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ compareAnimeTvKnob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+        <div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-sparkles" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Library</span></div>
+        <div onClick="{{ onToggleSmartRating }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-stars" style="font-size:18px; color:{{ smartRatingColor }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Smart rating</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Refine each score with quick head-to-head comparisons. Off uses your gut rating directly.</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ smartRatingBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ smartRatingKnob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+        <sc-if value="{{ smartRatingEnabled }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ onToggleSmartCross }}" style="display:flex; align-items:center; gap:13px; padding:13px 16px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-arrows-shuffle" style="font-size:17px; color:{{ smartCrossColor }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:13.5px; font-weight:500;">Compare anime with live-action</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">On: anime can face TV shows. Off: anime vs anime, TV vs TV.</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ smartCrossBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ smartCrossKnob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+        </sc-if>
+      </div>
+      <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;">
+        <div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-language" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Title language</span></div>
+        <div style="padding:14px 16px; display:flex; gap:7px;">
+          <span onClick="{{ lang.romaji.on }}" style="flex:1; text-align:center; padding:10px 4px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; background:{{ lang.romaji.bg }}; color:{{ lang.romaji.fg }}; border:1px solid {{ lang.romaji.bd }};">Romaji</span>
+          <span onClick="{{ lang.english.on }}" style="flex:1; text-align:center; padding:10px 4px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; background:{{ lang.english.bg }}; color:{{ lang.english.fg }}; border:1px solid {{ lang.english.bd }};">English</span>
+          <span onClick="{{ lang.native.on }}" style="flex:1; text-align:center; padding:10px 4px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; background:{{ lang.native.bg }}; color:{{ lang.native.fg }}; border:1px solid {{ lang.native.bd }};">Native</span>
+        </div>
       </div>
       <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden;">
         <div onClick="{{ onOpenAppearance }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;"><i class="ti ti-palette" style="font-size:18px; color:var(--accent); width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500;">Appearance</span><i class="ti ti-chevron-right" style="color:#5A5A63;"></i></div>
@@ -1714,9 +1785,6 @@
         <sc-if value="{{ signedInAnilist }}" hint-placeholder-val="{{ false }}">
         <div onClick="{{ onSignOut }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;"><i class="ti ti-logout" style="font-size:18px; color:#8E8E98; width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500;">Sign out</span></div>
         </sc-if>
-        <sc-if value="{{ guestProfile }}" hint-placeholder-val="{{ false }}">
-        <div onClick="{{ onSignOut }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;"><i class="ti ti-brand-anilist" style="font-size:18px; color:var(--accent); width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500;">Sign in with AniList</span><i class="ti ti-chevron-right" style="color:#5A5A63;"></i></div>
-        </sc-if>
         <div onClick="{{ onOpenReset }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-trash" style="font-size:18px; color:#E8633A; width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500; color:#E8633A;">Reset account</span></div>
       </div>
     </div>
@@ -1739,7 +1807,7 @@
   <!-- ════════ FILTER POPUP ════════ -->
   <sc-if value="{{ filterOpen }}" hint-placeholder-val="{{ false }}">
   <div onClick="{{ onCloseFilter }}" style="position:absolute; inset:0; z-index:330; background:rgba(0,0,0,0.55); display:flex; flex-direction:column; justify-content:flex-end; animation:rk-in .2s ease;">
-    <div onClick="{{ stopProp }}" class="rk-scroll" style="background:#15151A; border-top-left-radius:22px; border-top-right-radius:22px; border:1px solid rgba(255,255,255,0.09); max-height:78%; overflow-y:auto; padding:0 0 28px;">
+    <div onClick="{{ stopProp }}" class="rk-scroll" style="background:#15151A; border-top-left-radius:22px; border-top-right-radius:22px; border:1px solid rgba(255,255,255,0.09); max-height:78%; overflow-y:auto; padding:0;">
       <div style="position:sticky; top:0; background:#15151A; padding:16px 18px 12px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:12px; z-index:2;">
         <div style="width:38px; height:5px; border-radius:999px; background:#33333B; position:absolute; top:8px; left:50%; transform:translateX(-50%);"></div>
         <div style="flex:1; font-family:'Space Grotesk'; font-weight:700; font-size:19px; letter-spacing:-0.02em; margin-top:4px;">{{ filterPopTitle }}</div>
@@ -1820,7 +1888,7 @@
           <div style="font-size:12px; color:#5A5A63; line-height:1.5; padding:4px 2px 0;">{{ filterTagsLockedMsg }}</div>
         </sc-if>
       </div>
-      <div style="position:sticky; bottom:0; background:linear-gradient(transparent, #15151A 18%); padding:18px; display:flex; gap:9px; margin-top:8px;">
+      <div style="position:sticky; bottom:0; background:linear-gradient(transparent, #15151A 45%); padding:20px 18px 26px; display:flex; gap:9px; margin-top:8px;">
         <button onClick="{{ onClearFilterPop }}" style="flex:none; padding:14px 20px; border-radius:13px; background:transparent; border:1px solid rgba(255,255,255,0.16); color:#8E8E98; font-family:'Hanken Grotesk'; font-size:15px; font-weight:600; cursor:pointer;">Clear</button>
         <button onClick="{{ onApplyFilter }}" style="flex:1; padding:14px; border-radius:13px; background:var(--accent); color:#0D0D10; border:none; font-family:'Hanken Grotesk'; font-size:15px; font-weight:700; cursor:pointer;">{{ filterApplyLabel }}</button>
       </div>
@@ -1939,7 +2007,13 @@ class Component extends DCLogic {
     let pName = 'Anime Fan', pEmoji = '🎬', tmdbKey = '', listData = [], anilistToken = '', feedDismissed = {}, accentOverride = '', notifOn = true, guestMode = false, anilistPromptDismissed = false;
     let adult18 = false, adultAnime = false, adultMovies = false, adultTv = false;
     let notifFeed = true, notifWatchlist = true, notifGame = true, feedType = 'all';
-    let compareAnimeTv = true;
+    let gameTypes = { anime:true, movie:true, tv:true };
+    let smartRatingEnabled = true;
+    let feedMedia = { anime:true, movie:false, tv:false };
+    let feedMediaSaved = false;
+    let notifMedia = { anime:true, movie:true, tv:true };
+    let feedSetupSeen = false;
+    let smartCrossType = true;
     let showcaseHidden = {};
     try {
       pName = localStorage.getItem('rankit_pname') || 'Anime Fan';
@@ -1956,7 +2030,12 @@ class Component extends DCLogic {
       notifWatchlist = localStorage.getItem('rankit_notif_watchlist') !== '0';
       notifGame = localStorage.getItem('rankit_notif_game') !== '0';
       feedType = localStorage.getItem('rankit_feed_type') || 'all';
-      compareAnimeTv = localStorage.getItem('rankit_compare_anime_tv') !== '0';
+      smartRatingEnabled = localStorage.getItem('rankit_smart_rating') !== '0';
+      try { const fmj = localStorage.getItem('rankit_feed_media'); if (fmj) { feedMedia = Object.assign({ anime:true, movie:false, tv:false }, JSON.parse(fmj)); feedMediaSaved = true; } } catch(e4){}
+      try { const nm = localStorage.getItem('rankit_notif_media'); if (nm) notifMedia = Object.assign({ anime:true, movie:true, tv:true }, JSON.parse(nm)); } catch(e5){}
+      feedSetupSeen = localStorage.getItem('rankit_feed_setup') === '1';
+      smartCrossType = localStorage.getItem('rankit_smart_cross') !== '0';
+      try { const gt = localStorage.getItem('rankit_game_types'); if (gt) gameTypes = Object.assign({ anime:true, movie:true, tv:true }, JSON.parse(gt)); } catch(e3){}
       try { const sh = localStorage.getItem('rankit_showcase_hidden'); if (sh) showcaseHidden = JSON.parse(sh); } catch(e2){}
       guestMode = localStorage.getItem('rankit_guest') === '1';
       anilistPromptDismissed = localStorage.getItem('rankit_anilist_prompt_seen') === '1';
@@ -1965,6 +2044,12 @@ class Component extends DCLogic {
       const rawFd = localStorage.getItem('rankit_feed_dismissed');
       if (rawFd) feedDismissed = JSON.parse(rawFd);
     } catch(e){}
+    // Less anime-forward: if the user hasn't chosen feed types yet, seed them from what they actually track.
+    if (!feedMediaSaved && lib && lib.length) {
+      const has = t => lib.some(i => i.type === t);
+      const a = has('anime'), m = has('movie'), tv = has('tv');
+      if (a || m || tv) feedMedia = { anime:a, movie:m, tv:tv };
+    }
     this.state = {
       tab: 'library',
       acc: { watching:true, plan:false, completed:true, hold:false },
@@ -1973,7 +2058,7 @@ class Component extends DCLogic {
       dailyDate: dailyDate, dailyStreak: dailyStreak,
       titleLang: lang,
       libFilter: 'all',
-      filterOpen: false, filterCtx: 'discover', filterTagQ: '', animeFormat: 'all', gameMenuOpen: false,
+      filterOpen: false, filterCtx: 'discover', filterTagQ: '', animeFormat: 'all', gameMenuOpen: false, gameTypesOpen: false,
       pickerOpen: false, pickType: 'all', pickGenres: [], pickTags: [], pickTagsEx: [], pickResult: null, pickSpinning: false, pickIncludeHold: false,
       libGenres: [], libGenresEx: [], libTags: [], libTagsEx: [],
       librarySearchQ: '',
@@ -1986,6 +2071,8 @@ class Component extends DCLogic {
       tagCategories: null,
       discResults: null, discLoading: true, discError: false,
       discTrending: null, discPopular: null, discUpcoming: null,
+      discGenrePage: 1, discGenreHasMore: false, discGenreLoadingMore: false,
+      discResultsPage: 1, discResultsHasMore: false, discResultsLoadingMore: false,
       discRecs: null, discRecsLoading: false,
       tmdbKey, tmdbKeyInput: '',
       tmdbMovies: null, tmdbTv: null,
@@ -2004,7 +2091,8 @@ class Component extends DCLogic {
       notifOn: notifOn,
       adult18: adult18, adultAnime: adultAnime, adultMovies: adultMovies, adultTv: adultTv,
       notifFeed: notifFeed, notifWatchlist: notifWatchlist, notifGame: notifGame,
-      compareAnimeTv: compareAnimeTv,
+      gameTypes: gameTypes, smartRatingEnabled: smartRatingEnabled,
+      feedMedia: feedMedia, notifMedia: notifMedia, feedSetupSeen: feedSetupSeen, smartCrossType: smartCrossType,
       feedType: feedType, settingsOpen: false, feedSettingsOpen: false,
       showcaseType: 'anime', showcaseHidden: showcaseHidden, showcaseEdit: false,
       appearanceOpen: false,
@@ -2423,29 +2511,45 @@ class Component extends DCLogic {
     if (this.state.discSection === 'anime') this.fetchFilterAnime(genres, tags, genresEx, tagsEx, seq);
     else this.fetchFilterTmdb(genres, genresEx, seq);
   }
-  async fetchFilterAnime(genres, tags, genresEx, tagsEx, seq) {
+  async fetchFilterAnime(genres, tags, genresEx, tagsEx, seq, page, append) {
+    page = page || 1;
+    this._genreCtx = { section:'anime', genres, tags, genresEx, tagsEx, seq };
     // AniList: *_in are AND-combined; *_not_in exclude. Together → match all includes, none of the excludes.
-    const Q='query ($g:[String],$t:[String],$gx:[String],$tx:[String],$f:[MediaFormat]){Page(page:1,perPage:30){media(genre_in:$g,tag_in:$t,genre_not_in:$gx,tag_not_in:$tx,format_in:$f,sort:POPULARITY_DESC,type:ANIME){id title{romaji english native} coverImage{large} averageScore isAdult genres tags{name rank isMediaSpoiler} seasonYear episodes format}}}';
-    const data=await this.query(Q,{ g: genres.length?genres:null, t: tags.length?tags:null, gx: genresEx.length?genresEx:null, tx: tagsEx.length?tagsEx:null, f: this.animeFormatIn() });
+    const Q='query ($g:[String],$t:[String],$gx:[String],$tx:[String],$f:[MediaFormat],$p:Int){Page(page:$p,perPage:30){pageInfo{hasNextPage} media(genre_in:$g,tag_in:$t,genre_not_in:$gx,tag_not_in:$tx,format_in:$f,sort:POPULARITY_DESC,type:ANIME){id title{romaji english native} coverImage{large} averageScore isAdult genres tags{name rank isMediaSpoiler} seasonYear episodes format}}}';
+    const data=await this.query(Q,{ g: genres.length?genres:null, t: tags.length?tags:null, gx: genresEx.length?genresEx:null, tx: tagsEx.length?tagsEx:null, f: this.animeFormatIn(), p: page });
     if(this.state.filterSeq!==seq) return;
     if(data&&data.Page&&data.Page.media){
-      this.setState({discGenreResults:data.Page.media.map(m=>this.mediaToCatalog(m)),discGenreLoading:false});
-    } else { this.setState({discGenreLoading:false,discGenreError:true}); }
+      const mapped=data.Page.media.map(m=>this.mediaToCatalog(m));
+      const hasMore=!!(data.Page.pageInfo&&data.Page.pageInfo.hasNextPage);
+      this.setState(s=>({discGenreResults: append?[...(s.discGenreResults||[]),...mapped]:mapped, discGenreLoading:false, discGenreLoadingMore:false, discGenrePage:page, discGenreHasMore:hasMore}));
+    } else { this.setState({discGenreLoading:false,discGenreLoadingMore:false,discGenreError:!append,discGenreHasMore:false}); }
   }
-  async fetchFilterTmdb(genres, genresEx, seq) {
+  async fetchFilterTmdb(genres, genresEx, seq, page, append) {
+    page = page || 1;
     if(!this.state.tmdbKey && !this.state.backendAvailable){ this.setState({discGenreLoading:false,discGenreError:true}); return; }
+    this._genreCtx = { section:this.state.discSection, genres, tags:[], genresEx, tagsEx:[], seq };
     const ids=genres.map(g=>this.tmdbGenreId(g)).filter(Boolean).join(','); // comma = AND
     const idsEx=genresEx.map(g=>this.tmdbGenreId(g)).filter(Boolean).join(',');
     const type=this.state.discSection==='movies'?'movie':'tv';
-    const params={sort_by:'popularity.desc'};
+    const params={sort_by:'popularity.desc',page:page};
     if(ids) params.with_genres=ids;
     if(idsEx) params.without_genres=idsEx;
     const data=await this.tmdbQuery('/discover/'+type,params);
     if(this.state.filterSeq!==seq) return;
     const fn=type==='movie'?m=>this.tmdbMovieToCatalog(m):t=>this.tmdbTvToCatalog(t);
     if(data&&data.results){
-      this.setState({discGenreResults:data.results.map(fn),discGenreLoading:false});
-    } else { this.setState({discGenreLoading:false,discGenreError:true}); }
+      const mapped=data.results.map(fn);
+      const hasMore=!!(data.total_pages&&data.page<data.total_pages);
+      this.setState(s=>({discGenreResults: append?[...(s.discGenreResults||[]),...mapped]:mapped, discGenreLoading:false, discGenreLoadingMore:false, discGenrePage:page, discGenreHasMore:hasMore}));
+    } else { this.setState({discGenreLoading:false,discGenreLoadingMore:false,discGenreError:!append,discGenreHasMore:false}); }
+  }
+  loadMoreGenre() {
+    if(this.state.discGenreLoadingMore || !this.state.discGenreHasMore) return;
+    const ctx=this._genreCtx; if(!ctx) return;
+    this.setState({discGenreLoadingMore:true});
+    const page=(this.state.discGenrePage||1)+1;
+    if(ctx.section==='anime') this.fetchFilterAnime(ctx.genres,ctx.tags,ctx.genresEx,ctx.tagsEx,ctx.seq,page,true);
+    else this.fetchFilterTmdb(ctx.genres,ctx.genresEx,ctx.seq,page,true);
   }
 
   // ── edit / add ──
@@ -2621,10 +2725,17 @@ class Component extends DCLogic {
     const g = it.g; if (!g) return 0;
     return Math.max(0, Math.min(1, 1 - (g.rd - 50) / 300)); // rd 50→1.0, 350→0.0
   }
-  ratedPool() { return this.state.library.filter(i => i.status === 'completed' && i.smart != null && i.g); }
-  // When the "compare anime with TV" setting is off, never pit an anime against a live-action TV show.
+  ratedPool() {
+    const gt = this.state.gameTypes || { anime:true, movie:true, tv:true };
+    return this.state.library.filter(i => i.status === 'completed' && i.smart != null && i.g && gt[i.type] !== false);
+  }
+  // Game-tab media-type filter handles which titles are eligible; smart-rating compares freely.
   pairAllowed(a, b) {
-    if (this.state.compareAnimeTv) return true;
+    return true;
+  }
+  // Smart rating: when cross-type is off, never compare an anime against a live-action TV show.
+  pairAllowedSmart(a, b) {
+    if (this.state.smartCrossType !== false) return true;
     return !((a.type === 'anime' && b.type === 'tv') || (a.type === 'tv' && b.type === 'anime'));
   }
   // Pick the most *informative* matchup: bias toward close ratings + high combined uncertainty.
@@ -2733,12 +2844,14 @@ class Component extends DCLogic {
   pickSentiment(seed) { const s=this.state.smart; if(!s) return; s.init=seed; this.startCompare(); }
   buildPool() {
     const r=this.state.smart.init, me=this.state.smart.item;
-    const c=this.state.library.filter(i=>i.status==='completed'&&i.smart!=null&&i.id!==me.id&&Math.abs(i.smart-r)<=2.8&&this.pairAllowed(me,i));
+    const c=this.state.library.filter(i=>i.status==='completed'&&i.smart!=null&&i.id!==me.id&&Math.abs(i.smart-r)<=2.8&&this.pairAllowedSmart(me,i));
     for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]];}
     return c.slice(0,4);
   }
   startCompare() {
     const s=this.state.smart; s.pool=this.buildPool(); s.total=s.pool.length; s.round=0; s.results=[]; s.picked=null;
+    // Smart rating off → skip head-to-head; the gut/sentiment score stands.
+    if(this.state.smartRatingEnabled===false){this.finalizeSmart(s.init);return;}
     if(s.total===0){this.finalizeSmart(s.init);return;}
     s.phase='compare'; this.forceUpdate();
   }
@@ -2921,12 +3034,11 @@ class Component extends DCLogic {
   async fetchItemDesc(item) {
     this.setState({ovExtra:null});
     if(item.anilistId) {
-      const Q='query ($id:Int){Media(id:$id){description(asHtml:false) genres tags{name rank isMediaSpoiler} externalLinks{site url type} relations{edges{relationType node{id type format episodes seasonYear genres title{romaji english native} coverImage{large} averageScore}}} recommendations(sort:RATING_DESC perPage:12){nodes{mediaRecommendation{id type format episodes seasonYear genres title{romaji english native} coverImage{large} averageScore}}}}}';
+      const Q='query ($id:Int){Media(id:$id){description(asHtml:false) genres tags{name rank isMediaSpoiler} externalLinks{site url type} characters(sort:[ROLE,RELEVANCE],perPage:14){edges{role node{name{full} image{large}} voiceActors(language:JAPANESE,sort:RELEVANCE){name{full} image{large}}}} relations{edges{relationType node{id type format episodes seasonYear genres title{romaji english native} coverImage{large} averageScore}}} recommendations(sort:RATING_DESC perPage:12){nodes{mediaRecommendation{id type format episodes seasonYear genres title{romaji english native} coverImage{large} averageScore}}}}}';
       const data=await this.query(Q,{id:item.anilistId});
       if(data&&data.Media){
         const M=data.Media;
         let desc=(M.description||'').replace(/<[^>]+>/g,'').replace(/\n+/g,' ').trim();
-        if(desc.length>320) desc=desc.slice(0,320)+'…';
         const tags=this.topTags(M);
         const ei=this.state.editingItem;
         if(ei&&ei.id===item.id&&(!ei.tags||!ei.tags.length)){ ei.tags=tags; this.persist(); }
@@ -2934,7 +3046,7 @@ class Component extends DCLogic {
         this.buildExtraFromAnilist(item,M);
       } else { this.setState({ovDescData:{description:'',genres:[],tags:[]},ovExtra:{related:[],recs:[],guide:[],chain:[],noData:true}}); }
     } else if(item.tmdbId&&item.tmdbType) {
-      const data=await this.tmdbQuery('/'+item.tmdbType+'/'+item.tmdbId,{append_to_response:'recommendations,watch/providers'});
+      const data=await this.tmdbQuery('/'+item.tmdbType+'/'+item.tmdbId,{append_to_response:'recommendations,watch/providers,credits'});
       if(data){
         const desc=data.overview||'';
         const genres=(data.genres||[]).map(g=>g.name);
@@ -2982,7 +3094,14 @@ class Component extends DCLogic {
     chain.push({label:'You are here',card:this.shapeSelfCard(item),current:true});
     related.filter(r=>r.relRaw==='SEQUEL').forEach(r=>chain.push({label:'Watch next',card:r.card}));
     related.filter(r=>r.relRaw==='SIDE_STORY'||r.relRaw==='SPIN_OFF').forEach(r=>chain.push({label:'Optional / side',card:r.card}));
-    this.setState({ovExtra:{related,recs,guide,chain,noData:related.length===0&&recs.length===0&&guide.length===0}});
+    const characters=((M.characters&&M.characters.edges)||[]).map(e=>{
+      const va=(e.voiceActors&&e.voiceActors[0])||null;
+      const cn=(e.node&&e.node.name&&e.node.name.full)||'';
+      const cimg=(e.node&&e.node.image&&e.node.image.large)||'';
+      const role=e.role?(e.role.charAt(0)+e.role.slice(1).toLowerCase()):'';
+      return {bg:cimg?'center/cover no-repeat url("'+cimg+'")':this.grad(cn||'?'), em:cimg?'':(cn?cn[0]:'?'), name:cn, sub:va&&va.name?va.name.full:role, subIcon:va?'ti ti-microphone':''};
+    }).filter(c=>c.name);
+    this.setState({ovExtra:{related,recs,guide,chain,characters,noData:related.length===0&&recs.length===0&&guide.length===0&&characters.length===0}});
   }
   buildExtraFromTmdb(item,data) {
     const type=item.tmdbType;
@@ -2992,7 +3111,12 @@ class Component extends DCLogic {
     const region=wp.US||Object.values(wp)[0]||{};
     const seen={}; const guide=[];
     ['flatrate','free','ads','rent','buy'].forEach(k=>{(region[k]||[]).forEach(p=>{ if(!seen[p.provider_name]){seen[p.provider_name]=1; guide.push({site:p.provider_name,url:region.link||''});} });});
-    this.setState({ovExtra:{related:[],recs,guide,chain:[],noData:recs.length===0&&guide.length===0}});
+    const characters=((data.credits&&data.credits.cast)||[]).slice(0,14).map(p=>{
+      const img=p.profile_path?('https://image.tmdb.org/t/p/w185'+p.profile_path):'';
+      const actor=p.name||'', role=p.character||'';
+      return {bg:img?'center/cover no-repeat url("'+img+'")':this.grad(actor||'?'), em:img?'':(actor?actor[0]:'?'), name:role||actor, sub:role?actor:'', subIcon:''};
+    }).filter(c=>c.name);
+    this.setState({ovExtra:{related:[],recs,guide,chain:[],characters,noData:recs.length===0&&guide.length===0&&characters.length===0}});
   }
   shapeSelfCard(item) {
     return {id:item.id,anilistId:item.anilistId,tmdbId:item.tmdbId,tmdbType:item.tmdbType,titleObj:item.titleObj,
@@ -3005,21 +3129,40 @@ class Component extends DCLogic {
     clearTimeout(this._t);
     this._t=setTimeout(()=>this.runSearch(q),300);
   }
-  async runSearch(q) {
+  async runSearch(q, page, append) {
     if(q.length<2){this.setState({discResults:null});return;}
-    this.setState({discResults:[],discLoading:true});
+    page = page || 1;
+    if(!append) this.setState({discResults:[],discLoading:true});
+    this._searchCtx = { q, section:this.state.discSection };
     const sec=this.state.discSection;
     if(sec==='anime') {
       const fmt=this.animeFormatIn();
-      const Q='query ($s:String,$f:[MediaFormat]){Page(page:1,perPage:24){media(search:$s,type:ANIME,format_in:$f){id title{romaji english native} format episodes coverImage{large} averageScore isAdult genres tags{name rank isMediaSpoiler} seasonYear}}}';
-      const data=await this.query(Q,{s:q,f:fmt});
-      this.setState({discLoading:false,discResults:data&&data.Page?data.Page.media.map(m=>this.mediaToCatalog(m)):[]});
+      const Q='query ($s:String,$f:[MediaFormat],$p:Int){Page(page:$p,perPage:24){pageInfo{hasNextPage} media(search:$s,type:ANIME,format_in:$f){id title{romaji english native} format episodes coverImage{large} averageScore isAdult genres tags{name rank isMediaSpoiler} seasonYear}}}';
+      const data=await this.query(Q,{s:q,f:fmt,p:page});
+      const mapped=data&&data.Page?data.Page.media.map(m=>this.mediaToCatalog(m)):[];
+      const hasMore=!!(data&&data.Page&&data.Page.pageInfo&&data.Page.pageInfo.hasNextPage);
+      this.setState(s=>({discLoading:false,discResultsLoadingMore:false,discResultsPage:page,discResultsHasMore:hasMore,discResults: append?[...(s.discResults||[]),...mapped]:mapped}));
     } else {
       const type=sec==='movies'?'movie':'tv';
-      const data=await this.tmdbQuery('/search/'+type,{query:q});
+      const data=await this.tmdbQuery('/search/'+type,{query:q,page:page});
       const fn=type==='movie'?m=>this.tmdbMovieToCatalog(m):t=>this.tmdbTvToCatalog(t);
-      this.setState({discLoading:false,discResults:data&&data.results?data.results.map(fn):[]});
+      const mapped=data&&data.results?data.results.map(fn):[];
+      const hasMore=!!(data&&data.total_pages&&data.page<data.total_pages);
+      this.setState(s=>({discLoading:false,discResultsLoadingMore:false,discResultsPage:page,discResultsHasMore:hasMore,discResults: append?[...(s.discResults||[]),...mapped]:mapped}));
     }
+  }
+  loadMoreSearch() {
+    if(this.state.discResultsLoadingMore || !this.state.discResultsHasMore) return;
+    const ctx=this._searchCtx; if(!ctx || !ctx.q) return;
+    this.setState({discResultsLoadingMore:true});
+    this.runSearch(ctx.q, (this.state.discResultsPage||1)+1, true);
+  }
+  onDiscoverScroll(e) {
+    const el=e.target; if(!el) return;
+    if(el.scrollHeight - el.scrollTop - el.clientHeight > 480) return;
+    const st=this.state;
+    if(st.discGenreResults!=null && st.discGenreHasMore && !st.discGenreLoadingMore) this.loadMoreGenre();
+    else if(st.discResults!=null && st.discResultsHasMore && !st.discResultsLoadingMore) this.loadMoreSearch();
   }
 
   // ── TMDB API ──
@@ -3097,21 +3240,60 @@ class Component extends DCLogic {
 
   // ── feed ──
   persistFeedDismissed() { try{localStorage.setItem('rankit_feed_dismissed',JSON.stringify(this.state.feedDismissed));}catch(e){} }
+  setFeedMedia(type) {
+    const fm = Object.assign({ anime:true, movie:false, tv:false }, this.state.feedMedia || {});
+    fm[type] = !fm[type];
+    if (!fm.anime && !fm.movie && !fm.tv) { fm[type] = true; this.showToast('Keep at least one type on'); return; }
+    this.setState({ feedMedia: fm, feed: null, feedLoaded: false, feedLoading: true }, () => {
+      try { localStorage.setItem('rankit_feed_media', JSON.stringify(fm)); } catch(e){}
+      this.fetchFeed();
+    });
+  }
+  toggleNotifMedia(type) {
+    const nm = Object.assign({ anime:true, movie:true, tv:true }, this.state.notifMedia || {});
+    nm[type] = !nm[type];
+    this.setState({ notifMedia: nm }, () => { try { localStorage.setItem('rankit_notif_media', JSON.stringify(nm)); } catch(e){} });
+  }
+  dismissFeedSetup() {
+    this.setState({ feedSetupSeen: true });
+    try { localStorage.setItem('rankit_feed_setup', '1'); } catch(e){}
+  }
   async fetchFeed() {
     this.setState({feedLoading:true});
-    const Q='query{Page(page:1,perPage:15){media(status:RELEASING,sort:POPULARITY_DESC,type:ANIME){id title{romaji english native} coverImage{large} averageScore isAdult nextAiringEpisode{airingAt episode} format episodes genres tags{name rank isMediaSpoiler} seasonYear}}}';
-    const data=await this.query(Q);
-    if(data&&data.Page&&data.Page.media&&data.Page.media.length){
-      const items=data.Page.media.map(m=>{
-        const ne=m.nextAiringEpisode;
-        const hrs=ne?Math.max(0,Math.round((ne.airingAt*1000-Date.now())/3600000)):null;
-        const sub=ne?('Ep '+ne.episode+' · airing in '+(hrs>=24?Math.round(hrs/24)+'d':hrs+'h')+(m.averageScore?' · ★'+m.averageScore:'')):('Currently airing'+(m.averageScore?' · ★'+m.averageScore:''));
-        const fmt=m.format; let type='anime';
-        if(fmt==='MOVIE') type='movie'; else if(fmt==='TV'||fmt==='TV_SHORT') type='tv';
-        return {id:m.id,titleObj:m.title,title:this.prefTitle(m),cover:(m.coverImage&&m.coverImage.large)||'',sub,type,year:m.seasonYear||'',episodes:m.episodes||null,score:m.averageScore?m.averageScore/10:null,genres:m.genres||[],tags:this.topTags(m)};
-      });
-      this.setState({feed:items,feedLoading:false,feedLoaded:true,feedError:false});
-    } else { this.setState({feed:[],feedLoading:false,feedLoaded:true,feedError:true}); }
+    const fm = this.state.feedMedia || { anime:true, movie:false, tv:false };
+    const tmdbOk = !!(this.state.tmdbKey || this.state.backendAvailable);
+    const tasks = [];
+    if (fm.anime !== false) {
+      const Q='query{Page(page:1,perPage:15){media(status:RELEASING,sort:POPULARITY_DESC,type:ANIME){id title{romaji english native} coverImage{large} averageScore isAdult nextAiringEpisode{airingAt episode} format episodes seasonYear genres}}}';
+      tasks.push(this.query(Q).then(data=>{
+        if(!(data&&data.Page&&data.Page.media)) return [];
+        return data.Page.media.map(m=>{
+          const ne=m.nextAiringEpisode;
+          const hrs=ne?Math.max(0,Math.round((ne.airingAt*1000-Date.now())/3600000)):null;
+          const sub=ne?('Ep '+ne.episode+' · airing in '+(hrs>=24?Math.round(hrs/24)+'d':hrs+'h')+(m.averageScore?' · ★'+m.averageScore:'')):('Currently airing'+(m.averageScore?' · ★'+m.averageScore:''));
+          return {id:m.id,anilistId:m.id,tmdbId:null,tmdbType:null,titleObj:m.title,title:this.prefTitle(m),cover:(m.coverImage&&m.coverImage.large)||'',sub,type:'anime',year:m.seasonYear||'',episodes:m.episodes||null,score:m.averageScore?m.averageScore/10:null,isAdult:!!m.isAdult,genres:m.genres||[]};
+        });
+      }).catch(()=>[]));
+    }
+    if (fm.movie && tmdbOk) {
+      tasks.push(this.tmdbQuery('/movie/now_playing').then(d=>{
+        if(!(d&&d.results)) return [];
+        return d.results.slice(0,15).map(m=>{const c=this.tmdbMovieToCatalog(m);return {id:'m'+c.id,anilistId:null,tmdbId:c.tmdbId,tmdbType:'movie',titleObj:null,title:c.title,cover:c.cover,sub:'In theaters'+(c.year?' · '+c.year:'')+(c.score?' · ★'+c.score:''),type:'movie',year:c.year,episodes:null,score:c.score,isAdult:c.isAdult,genres:c.genres||[]};});
+      }).catch(()=>[]));
+    }
+    if (fm.tv && tmdbOk) {
+      tasks.push(this.tmdbQuery('/tv/on_the_air').then(d=>{
+        if(!(d&&d.results)) return [];
+        return d.results.slice(0,15).map(t=>{const c=this.tmdbTvToCatalog(t);return {id:'t'+c.id,anilistId:null,tmdbId:c.tmdbId,tmdbType:'tv',titleObj:null,title:c.title,cover:c.cover,sub:'Now airing'+(c.year?' · '+c.year:'')+(c.score?' · ★'+c.score:''),type:'tv',year:c.year,episodes:null,score:c.score,isAdult:c.isAdult,genres:c.genres||[]};});
+      }).catch(()=>[]));
+    }
+    if (!tasks.length) { this.setState({feed:[],feedLoading:false,feedLoaded:true,feedError:true}); return; }
+    const results = await Promise.all(tasks);
+    // Interleave sources so the feed alternates types rather than grouping them.
+    const lists = results.filter(r=>r&&r.length);
+    const merged=[]; let i=0, any=true;
+    while(any){ any=false; for(const l of lists){ if(i<l.length){ merged.push(l[i]); any=true; } } i++; }
+    this.setState({feed:merged,feedLoading:false,feedLoaded:true,feedError:merged.length===0});
   }
 
   // ── shaping ──
@@ -3138,7 +3320,7 @@ class Component extends DCLogic {
   shapeFeed(f) {
     const self=this;
     const title=f.titleObj?this.resolveTitle(f.titleObj,f.title):f.title;
-    const cat={id:f.id,anilistId:f.id,tmdbId:null,tmdbType:null,titleObj:f.titleObj,title:title,type:f.type,year:f.year,episodes:f.episodes,cover:f.cover,score:f.score,genres:f.genres||[],tags:f.tags||[]};
+    const cat={id:f.id,anilistId:(f.anilistId!==undefined?f.anilistId:f.id),tmdbId:f.tmdbId||null,tmdbType:f.tmdbType||null,titleObj:f.titleObj,title:title,type:f.type,year:f.year,episodes:f.episodes,cover:f.cover,score:f.score,genres:f.genres||[],tags:f.tags||[]};
     return {
       id:f.id,title:title,sub:f.sub,
       bg:f.cover?'center/cover no-repeat url("'+f.cover+'")':this.grad(f.title),
@@ -3184,9 +3366,20 @@ class Component extends DCLogic {
     this.setState({ showcaseHidden: h }, () => this.persistShowcaseHidden());
   }
   // ── adult / 18+ content ──
-  toggleCompareAnimeTv() {
-    const v = !this.state.compareAnimeTv;
-    this.setState({ compareAnimeTv: v }, () => { try { localStorage.setItem('rankit_compare_anime_tv', v ? '1' : '0'); } catch(e){} });
+  toggleSmartRating() {
+    const v = !this.state.smartRatingEnabled;
+    this.setState({ smartRatingEnabled: v }, () => { try { localStorage.setItem('rankit_smart_rating', v ? '1' : '0'); } catch(e){} });
+  }
+  toggleSmartCrossType() {
+    const v = !this.state.smartCrossType;
+    this.setState({ smartCrossType: v }, () => { try { localStorage.setItem('rankit_smart_cross', v ? '1' : '0'); } catch(e){} });
+  }
+  toggleGameType(t) {
+    const gt = Object.assign({ anime:true, movie:true, tv:true }, this.state.gameTypes || {});
+    gt[t] = !(gt[t] !== false);
+    // never allow all three off — keep at least one media type eligible
+    if (!gt.anime && !gt.movie && !gt.tv) { gt[t] = true; this.showToast('Keep at least one type on'); }
+    this.setState({ gameTypes: gt }, () => { try { localStorage.setItem('rankit_game_types', JSON.stringify(gt)); } catch(e){} });
   }
   toggleAdult18() {
     const v = !this.state.adult18;
@@ -3226,6 +3419,26 @@ class Component extends DCLogic {
   setAccent(hex) {
     this.setState({ accentOverride: hex });
     try { localStorage.setItem('rankit_accent', hex); } catch(e){}
+  }
+  hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => { const c = l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))); return Math.round(255 * c).toString(16).padStart(2, '0'); };
+    return ('#' + f(0) + f(8) + f(4)).toUpperCase();
+  }
+  hexToHsl(hex) {
+    hex = (hex || '').replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    if (hex.length < 6) return { h: 80, s: 80, l: 58 };
+    const r = parseInt(hex.slice(0, 2), 16) / 255, g = parseInt(hex.slice(2, 4), 16) / 255, b = parseInt(hex.slice(4, 6), 16) / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    let h = 0; const l = (mx + mn) / 2; const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+    if (d !== 0) {
+      if (mx === r) h = ((g - b) / d) % 6; else if (mx === g) h = (b - r) / d + 2; else h = (r - g) / d + 4;
+      h *= 60; if (h < 0) h += 360;
+    }
+    return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
   }
   shareProfile() {
     this.setState({ settingsOpen: false });
@@ -3353,7 +3566,7 @@ class Component extends DCLogic {
   closeReset() { this.setState({resetConfirmOpen:false}); }
   doReset() {
     try {
-      ['rankit_lib_v4','rankit_lists_v1','rankit_pname','rankit_pemoji','rankit_lang','rankit_tmdb_key','rankit_accent','rankit_notif','rankit_feed_dismissed','rankit_adult18','rankit_adult_anime','rankit_adult_movies','rankit_adult_tv','rankit_notif_feed','rankit_notif_watchlist','rankit_notif_game','rankit_feed_type','rankit_showcase_hidden','rankit_compare_anime_tv'].forEach(k=>localStorage.removeItem(k));
+      ['rankit_lib_v4','rankit_lists_v1','rankit_pname','rankit_pemoji','rankit_lang','rankit_tmdb_key','rankit_accent','rankit_notif','rankit_feed_dismissed','rankit_adult18','rankit_adult_anime','rankit_adult_movies','rankit_adult_tv','rankit_notif_feed','rankit_notif_watchlist','rankit_notif_game','rankit_feed_type','rankit_showcase_hidden','rankit_compare_anime_tv','rankit_smart_rating','rankit_game_types','rankit_feed_media','rankit_notif_media','rankit_feed_setup','rankit_smart_cross'].forEach(k=>localStorage.removeItem(k));
     } catch(e){}
     this.setState({
       library:[], lists:[], tab:'library',
@@ -3361,6 +3574,7 @@ class Component extends DCLogic {
       titleLang:'romaji', tmdbKey:'', tmdbKeyInput:'', accentOverride:'', notifOn:true,
       adult18:false, adultAnime:false, adultMovies:false, adultTv:false,
       notifFeed:true, notifWatchlist:true, notifGame:true, feedType:'all', settingsOpen:false, feedSettingsOpen:false,
+      gameTypes:{anime:true,movie:true,tv:true}, smartRatingEnabled:true, feedMedia:{anime:true,movie:false,tv:false}, notifMedia:{anime:true,movie:true,tv:true}, feedSetupSeen:false, smartCrossType:true,
       showcaseType:'anime', showcaseHidden:{}, showcaseEdit:false,
       tmdbMovies:null, tmdbTv:null,
       discRecs:null, feed:null, feedLoaded:false, feedDismissed:{},
@@ -3915,13 +4129,24 @@ class Component extends DCLogic {
     let visibleFeed=(st.feed||[]).filter(f=>!dismissed[f.id]);
     visibleFeed=this.filterAdult(visibleFeed);
     if((st.feedType||'all')==='watchlist'){
-      const watchIds={}; lib.forEach(i=>{ if(i.anilistId) watchIds[i.anilistId]=1; });
-      visibleFeed=visibleFeed.filter(f=>watchIds[f.id]);
+      const aniIds={}, tmdbIds={}; lib.forEach(i=>{ if(i.anilistId) aniIds[i.anilistId]=1; if(i.tmdbId) tmdbIds[i.tmdbType+'-'+i.tmdbId]=1; });
+      visibleFeed=visibleFeed.filter(f=> (f.anilistId&&aniIds[f.anilistId]) || (f.tmdbId&&tmdbIds[f.tmdbType+'-'+f.tmdbId]) );
     }
 
     const ACCENTS=['#C8F03C','#df6bff','#5BD7E0','#F0C24E','#FF6B6B','#1FBF7A'];
     const accentSwatches=ACCENTS.map(c=>({color:c,active:A===c,border:A===c?'#F4F4F2':'transparent',on:()=>this.setAccent(c)}));
+    const accentIsCustom=ACCENTS.indexOf((A||'').toLowerCase())<0 && ACCENTS.indexOf(A)<0;
+    const accentHsl=this.hexToHsl(A);
+    const accentShades=[40,50,58,66,74].map(l=>{const col=this.hslToHex(accentHsl.h,Math.max(45,accentHsl.s),l);return{color:col,border:(A||'').toUpperCase()===col?'#F4F4F2':'rgba(255,255,255,0.10)',on:()=>this.setAccent(col)};});
     return {
+      loggedOut: !st.account && !st.anilistToken,
+      onCustomAccent:(e)=>this.setAccent(e.target.value),
+      onHueInput:(e)=>this.setAccent(this.hslToHex(+e.target.value,72,58)),
+      accentHue:accentHsl.h,
+      accentShades,
+      accentIsCustom,
+      accentHexLabel:(A||'').toUpperCase(),
+      accentCustomBd:accentIsCustom?'rgba(255,255,255,0.30)':'rgba(255,255,255,0.07)',
       accent:A,
       accentSwatches,
       appearanceOpen:st.appearanceOpen,
@@ -3973,11 +4198,17 @@ class Component extends DCLogic {
       // adult / 18+
       adult18:st.adult18, adultLocked:!st.adult18,
       onToggleAdult18:()=>this.toggleAdult18(),
-      compareAnimeTv:st.compareAnimeTv,
-      onToggleCompareAnimeTv:()=>this.toggleCompareAnimeTv(),
-      compareAnimeTvColor:st.compareAnimeTv?'var(--accent)':'#8E8E98',
-      compareAnimeTvBg:st.compareAnimeTv?'var(--accent)':'#2A2A31',
-      compareAnimeTvKnob:st.compareAnimeTv?'20px':'3px',
+      smartRatingEnabled:st.smartRatingEnabled,
+      onToggleSmartRating:()=>this.toggleSmartRating(),
+      smartRatingColor:st.smartRatingEnabled?'var(--accent)':'#8E8E98',
+      smartRatingBg:st.smartRatingEnabled?'var(--accent)':'#2A2A31',
+      smartRatingKnob:st.smartRatingEnabled?'20px':'3px',
+      smartCrossOn:st.smartCrossType!==false,
+      onToggleSmartCross:()=>this.toggleSmartCrossType(),
+      smartCrossColor:st.smartCrossType!==false?'var(--accent)':'#8E8E98',
+      smartCrossBg:st.smartCrossType!==false?'var(--accent)':'#2A2A31',
+      smartCrossKnob:st.smartCrossType!==false?'20px':'3px',
+      smartCrossLabel:st.smartCrossType!==false?'Anime vs TV allowed':'Same type only',
       adult18Color:st.adult18?'var(--accent)':'#8E8E98',
       adult18Bg:st.adult18?'var(--accent)':'#2A2A31', adult18Knob:st.adult18?'20px':'3px',
       onToggleAdultAnime:()=>this.toggleAdultType('anime'),
@@ -4020,6 +4251,9 @@ class Component extends DCLogic {
       discLoading:st.discLoading&&isAnimeSec,
       discError:st.discError&&isAnimeSec,
       onRetryDiscover:()=>this.fetchDiscover(),
+      onDiscoverScroll:(e)=>this.onDiscoverScroll(e),
+      discGenreLoadingMore:st.discGenreLoadingMore,
+      discResultsLoadingMore:st.discResultsLoadingMore,
       showResults:st.discResults!=null,
       resultsReady:st.discResults!=null&&!st.discLoading,
       resultsEmpty:st.discResults!=null&&st.discResults.length===0&&!((isMoviesSec||isTvSec)&&!st.tmdbKey&&!st.backendAvailable),
@@ -4145,6 +4379,33 @@ class Component extends DCLogic {
       feedTypeWatchFg:(st.feedType||'all')==='watchlist'?'var(--accent)':'#F4F4F2',
       feedSectionLabel:(st.feedType||'all')==='watchlist'?'From your watchlist':'Now airing',
       feedEmptyMsg:(st.feedType||'all')==='watchlist'?'No airing titles from your watchlist right now.':"You're all caught up.",
+      // feed media-type customisation
+      onToggleFeedAnime:()=>this.setFeedMedia('anime'),
+      onToggleFeedMovie:()=>this.setFeedMedia('movie'),
+      onToggleFeedTv:()=>this.setFeedMedia('tv'),
+      feedAnimeOn:(st.feedMedia||{}).anime!==false,
+      feedMovieOn:!!(st.feedMedia||{}).movie,
+      feedTvOn:!!(st.feedMedia||{}).tv,
+      feedAnimeBg:(st.feedMedia||{}).anime!==false?'var(--accent)':'#2A2A31',
+      feedAnimeKnob:(st.feedMedia||{}).anime!==false?'20px':'3px',
+      feedMovieBg:(st.feedMedia||{}).movie?'var(--accent)':'#2A2A31',
+      feedMovieKnob:(st.feedMedia||{}).movie?'20px':'3px',
+      feedTvBg:(st.feedMedia||{}).tv?'var(--accent)':'#2A2A31',
+      feedTvKnob:(st.feedMedia||{}).tv?'20px':'3px',
+      feedMediaNeedsTmdb:(((st.feedMedia||{}).movie||(st.feedMedia||{}).tv)&&!st.tmdbKey&&!st.backendAvailable),
+      onToggleNotifAnime:()=>this.toggleNotifMedia('anime'),
+      onToggleNotifMovie:()=>this.toggleNotifMedia('movie'),
+      onToggleNotifTv:()=>this.toggleNotifMedia('tv'),
+      notifMediaAnimeBg:(st.notifOn&&(st.notifMedia||{}).anime!==false)?'var(--accent)':'#2A2A31',
+      notifMediaAnimeKnob:(st.notifOn&&(st.notifMedia||{}).anime!==false)?'19px':'3px',
+      notifMediaMovieBg:(st.notifOn&&(st.notifMedia||{}).movie!==false)?'var(--accent)':'#2A2A31',
+      notifMediaMovieKnob:(st.notifOn&&(st.notifMedia||{}).movie!==false)?'19px':'3px',
+      notifMediaTvBg:(st.notifOn&&(st.notifMedia||{}).tv!==false)?'var(--accent)':'#2A2A31',
+      notifMediaTvKnob:(st.notifOn&&(st.notifMedia||{}).tv!==false)?'19px':'3px',
+      feedSetupShow:!st.feedSetupSeen,
+      onDismissFeedSetup:()=>this.dismissFeedSetup(),
+      onOpenFeedSetup:()=>this.setState({feedSettingsOpen:true}),
+      feedSummaryText:(()=>{const m=st.feedMedia||{};const on=[];if(m.anime)on.push('anime');if(m.movie)on.push('movies');if(m.tv)on.push('TV');return on.length?on.join(', '):'nothing yet';})(),
       // profile
       avgText:avg,dist,pStats,genreBreakdown,topRanked,noGenres:genreBreakdown.length===0,hasTopRanked:topRanked.length>0,
       showcaseTabs,showcaseGrid,showcaseHiddenList,
@@ -4179,6 +4440,19 @@ class Component extends DCLogic {
       gameMenuOpen: st.gameMenuOpen,
       onOpenGameMenu: ()=>this.setState({gameMenuOpen:true}),
       onCloseGameMenu: ()=>this.setState({gameMenuOpen:false}),
+      gameTypesOpen: st.gameTypesOpen,
+      onOpenGameTypes: ()=>this.setState({gameTypesOpen:true}),
+      onCloseGameTypes: ()=>this.setState({gameTypesOpen:false}),
+      gtAnimeOn: (st.gameTypes||{}).anime!==false,
+      gtMovieOn: (st.gameTypes||{}).movie!==false,
+      gtTvOn: (st.gameTypes||{}).tv!==false,
+      gtAnimePill: this.pillStyle((st.gameTypes||{}).anime!==false),
+      gtMoviePill: this.pillStyle(!!(st.gameTypes||{}).movie),
+      gtTvPill: this.pillStyle(!!(st.gameTypes||{}).tv),
+      gtSummary: (()=>{const g=st.gameTypes||{};const on=[];if(g.anime!==false)on.push('Anime');if(g.movie!==false)on.push('Movies');if(g.tv!==false)on.push('TV');return on.length===3?'All media types':on.join(' · ');})(),
+      onToggleGtAnime: ()=>this.toggleGameType('anime'),
+      onToggleGtMovie: ()=>this.toggleGameType('movie'),
+      onToggleGtTv: ()=>this.toggleGameType('tv'),
       onMenuPlayDaily: ()=>{this.setState({gameMenuOpen:false}); this.startGame('daily');},
       onMenuPlayGauntlet: ()=>{this.setState({gameMenuOpen:false}); this.startGame('gauntlet');},
       onPlayDaily: ()=>this.startGame('daily'),
