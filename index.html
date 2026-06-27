@@ -606,6 +606,17 @@
         </div>
         <div style="font-size:13px; color:#8E8E98; margin-top:8px;">{{ libCountText }}</div>
       </sc-if>
+      <sc-if value="{{ accountProfile }}" hint-placeholder-val="{{ false }}">
+        <div style="width:82px; height:82px; border-radius:50%; background:linear-gradient(150deg,#D4F84A,#A9D119); border:2px solid rgba(200,240,60,0.35); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:36px; color:#0D0D10; margin:0 auto 8px;">{{ accountInitial }}</div>
+        <div style="display:inline-flex; align-items:center; gap:7px;">
+          <span style="font-family:'Space Grotesk'; font-weight:700; font-size:21px; letter-spacing:-0.03em;">{{ accountName }}</span>
+        </div>
+        <div style="display:inline-flex; align-items:center; gap:5px; margin:6px auto 0; padding:3px 10px; border-radius:999px; background:rgba(31,191,122,0.12); border:1px solid rgba(31,191,122,0.25);">
+          <i class="ti ti-cloud-check" style="font-size:12px; color:#1FBF7A;"></i>
+          <span style="font-size:11px; font-weight:600; color:#1FBF7A;">Signed in</span>
+        </div>
+        <div style="font-size:13px; color:#8E8E98; margin-top:8px;">{{ libCountText }}</div>
+      </sc-if>
       <sc-if value="{{ guestProfile }}" hint-placeholder-val="{{ true }}">
       <div onClick="{{ onAvatarTap }}" style="cursor:pointer; width:82px; height:82px; border-radius:50%; background:rgba(200,240,60,0.11); border:2px solid rgba(200,240,60,0.25); display:flex; align-items:center; justify-content:center; font-size:38px; margin:0 auto 6px;">{{ profileEmoji }}</div>
       <sc-if value="{{ profileEmojiPicking }}" hint-placeholder-val="{{ false }}">
@@ -1435,7 +1446,14 @@
           <sc-if value="{{ importHasMore }}" hint-placeholder-val="{{ false }}">
             <div style="text-align:center; font-size:12px; color:#5A5A63; margin-bottom:14px;">…and {{ importMoreCount }} more</div>
           </sc-if>
+          <sc-if value="{{ importMatching }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;"><span style="font-size:13px; font-weight:600; color:#C7C7CE; display:flex; align-items:center; gap:9px;"><span style="width:15px; height:15px; border-radius:50%; border:2px solid rgba(255,255,255,0.15); border-top-color:var(--accent); animation:rk-spin .8s linear infinite; display:inline-block;"></span>Matching to TMDB…</span><span style="font-family:'Space Mono'; font-size:12px; color:#8E8E98;">{{ importMatchProgress }}</span></div>
+            <div style="height:6px; border-radius:999px; background:#222229; overflow:hidden; margin-bottom:8px;"><div style="height:100%; width:{{ importMatchPct }}%; background:var(--accent); border-radius:999px; transition:width .2s;"></div></div>
+            <div style="font-size:11.5px; color:#5A5A63; line-height:1.5;">Fetching genres &amp; cover art for your films — you can leave this open.</div>
+          </sc-if>
+          <sc-if value="{{ importNotMatching }}" hint-placeholder-val="{{ true }}">
           <button onClick="{{ onDoImport }}" style="width:100%; padding:15px; background:var(--accent); color:#0D0D10; border:none; border-radius:13px; font-family:'Hanken Grotesk'; font-size:15px; font-weight:700; cursor:pointer;">{{ importBtnLabel }}</button>
+          </sc-if>
         </sc-if>
         <sc-if value="{{ importDone }}" hint-placeholder-val="{{ false }}">
           <div style="text-align:center; padding:32px 16px; display:flex; flex-direction:column; align-items:center; gap:12px;">
@@ -1477,7 +1495,14 @@
           <sc-if value="{{ importHasMore }}" hint-placeholder-val="{{ false }}">
             <div style="text-align:center; font-size:12px; color:#5A5A63; margin-bottom:14px;">…and {{ importMoreCount }} more</div>
           </sc-if>
+          <sc-if value="{{ importMatching }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;"><span style="font-size:13px; font-weight:600; color:#C7C7CE; display:flex; align-items:center; gap:9px;"><span style="width:15px; height:15px; border-radius:50%; border:2px solid rgba(255,255,255,0.15); border-top-color:var(--accent); animation:rk-spin .8s linear infinite; display:inline-block;"></span>Matching to TMDB…</span><span style="font-family:'Space Mono'; font-size:12px; color:#8E8E98;">{{ importMatchProgress }}</span></div>
+            <div style="height:6px; border-radius:999px; background:#222229; overflow:hidden; margin-bottom:8px;"><div style="height:100%; width:{{ importMatchPct }}%; background:var(--accent); border-radius:999px; transition:width .2s;"></div></div>
+            <div style="font-size:11.5px; color:#5A5A63; line-height:1.5;">Fetching genres &amp; cover art for your films — you can leave this open.</div>
+          </sc-if>
+          <sc-if value="{{ importNotMatching }}" hint-placeholder-val="{{ true }}">
           <button onClick="{{ onDoImport }}" style="width:100%; padding:15px; background:var(--accent); color:#0D0D10; border:none; border-radius:13px; font-family:'Hanken Grotesk'; font-size:15px; font-weight:700; cursor:pointer;">{{ importBtnLabel }}</button>
+          </sc-if>
         </sc-if>
         <sc-if value="{{ importDone }}" hint-placeholder-val="{{ false }}">
           <div style="text-align:center; padding:32px 16px; display:flex; flex-direction:column; align-items:center; gap:12px;">
@@ -1637,8 +1662,12 @@
           <div onClick="{{ onSignInAnilist }}" style="text-align:center; padding:12px; background:#2D7BB6; color:#fff; border-radius:12px; font-family:'Hanken Grotesk'; font-size:14px; font-weight:700; cursor:pointer;">Connect AniList</div>
         </div>
       </sc-if>
-      <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;"><div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-shield-lock" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Content &amp; maturity</span></div><div onClick="{{ onToggleAdult18 }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-circle-letter-r" style="font-size:18px; color:{{ adult18Color }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Show 18+ content</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Unlocks sexual tags &amp; adult titles</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ adult18Bg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adult18Knob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><sc-if value="{{ adult18 }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:8px 16px 2px 22px;">Show adult titles in</div><div onClick="{{ onToggleAdultAnime }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-broadcast" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Anime</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultAnimeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultAnimeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultMovies }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-movie" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Movies</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultMoviesBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultMoviesKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultTv }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-device-tv" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">TV shows</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultTvKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-if><sc-if value="{{ adultLocked }}" hint-placeholder-val="{{ true }}"><div style="padding:10px 16px 14px; font-size:11.5px; color:#5A5A63; line-height:1.5; border-top:1px solid rgba(255,255,255,0.05);">Sexual tags and adult titles stay hidden across Discover &amp; Library until you turn this on.</div></sc-if>
+      <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;"><div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-shield-lock" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Content &amp; maturity</span></div><div onClick="{{ onToggleAdult18 }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-circle-letter-r" style="font-size:18px; color:{{ adult18Color }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Show 18+ content</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Unlocks sexual tags &amp; adult titles</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ adult18Bg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adult18Knob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><sc-if value="{{ adult18 }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:8px 16px 2px 22px;">Show adult titles in</div><div onClick="{{ onToggleAdultAnime }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-broadcast" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Anime</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultAnimeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultAnimeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultMovies }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-movie" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Movies</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultMoviesBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultMoviesKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultTv }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-device-tv" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">TV shows</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultTvKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-if><sc-if value="{{ adultLocked }}" hint-placeholder-val="{{ true }}"><div style="padding:10px 16px 14px; font-size:11.5px; color:#5A5A63; line-height:1.5; border-top:1px solid rgba(255,255,255,0.05);">Sexual tags and adult titles stay hidden across Discover &amp; Library until you turn this on.</div></sc-if></div>
       <div style="height:14px;"></div>
+      <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;">
+        <div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-swords" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Rating games</span></div>
+        <div onClick="{{ onToggleCompareAnimeTv }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-arrows-shuffle" style="font-size:18px; color:{{ compareAnimeTvColor }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Compare anime with TV shows</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Match anime against live-action TV in would-you-rather games</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ compareAnimeTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ compareAnimeTvKnob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+      </div>
       <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden;">
         <div onClick="{{ onOpenAppearance }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;"><i class="ti ti-palette" style="font-size:18px; color:var(--accent); width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500;">Appearance</span><i class="ti ti-chevron-right" style="color:#5A5A63;"></i></div>
         <div onClick="{{ onToggleNotif }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;"><i class="ti ti-bell" style="font-size:18px; color:var(--accent); width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500;">Notifications</span><div style="width:42px; height:25px; border-radius:999px; background:{{ notifBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifKnob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><sc-if value="{{ notifOn }}" hint-placeholder-val="{{ true }}"><div onClick="{{ onToggleNotifFeed }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-broadcast" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><div style="flex:1;"><div style="font-size:13.5px; font-weight:500;">New episodes</div><div style="font-size:11px; color:#8E8E98; margin-top:1px;">Airing updates from the general feed</div></div><div style="width:40px; height:23px; border-radius:999px; background:{{ notifFeedBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifFeedKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleNotifWatchlist }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-bookmark" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><div style="flex:1;"><div style="font-size:13.5px; font-weight:500;">Watchlist updates</div><div style="font-size:11px; color:#8E8E98; margin-top:1px;">Only titles on your watchlist</div></div><div style="width:40px; height:23px; border-radius:999px; background:{{ notifWatchlistBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifWatchlistKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleNotifGame }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-swords" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><div style="flex:1;"><div style="font-size:13.5px; font-weight:500;">Rating game reminders</div><div style="font-size:11px; color:#8E8E98; margin-top:1px;">Daily Five streak nudges</div></div><div style="width:40px; height:23px; border-radius:999px; background:{{ notifGameBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifGameKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-if>
@@ -1824,10 +1853,13 @@
         </div>
         </sc-if>
         <sc-if value="{{ pickHasTags }}" hint-placeholder-val="{{ false }}">
-        <div style="font-family:'Space Mono'; font-size:10px; font-weight:700; letter-spacing:0.13em; text-transform:uppercase; color:#5A5A63; margin-bottom:10px; display:flex; align-items:center; gap:6px;"><i class="ti ti-tags" style="font-size:13px;"></i>Tags</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <div style="font-family:'Space Mono'; font-size:10px; font-weight:700; letter-spacing:0.13em; text-transform:uppercase; color:#5A5A63; display:flex; align-items:center; gap:6px;"><i class="ti ti-tags" style="font-size:13px;"></i>Tags</div>
+          <div style="font-size:11px; color:#5A5A63; display:flex; align-items:center; gap:5px;"><span style="width:9px; height:9px; border-radius:3px; background:var(--accent); display:inline-block;"></span>include<span style="width:9px; height:9px; border-radius:3px; background:#E8633A; display:inline-block; margin-left:6px;"></span>exclude</div>
+        </div>
         <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px;">
           <sc-for list="{{ pickTagChips }}" as="t" hint-placeholder-count="8">
-            <button onClick="{{ t.on }}" style="padding:7px 12px; border-radius:999px; font-family:'Hanken Grotesk'; font-weight:600; font-size:12px; cursor:pointer; background:{{ t.bg }}; color:{{ t.fg }}; border:1px solid {{ t.bd }};">{{ t.label }}</button>
+            <button onClick="{{ t.on }}" style="padding:7px 12px; border-radius:999px; font-family:'Hanken Grotesk'; font-weight:600; font-size:12px; cursor:pointer; background:{{ t.bg }}; color:{{ t.fg }}; border:1px solid {{ t.bd }}; display:flex; align-items:center; gap:5px;"><sc-if value="{{ t.active }}" hint-placeholder-val="{{ false }}"><i class="ti {{ t.icon }}" style="font-size:11px;"></i></sc-if>{{ t.label }}</button>
           </sc-for>
         </div>
         </sc-if>
@@ -1907,6 +1939,7 @@ class Component extends DCLogic {
     let pName = 'Anime Fan', pEmoji = '🎬', tmdbKey = '', listData = [], anilistToken = '', feedDismissed = {}, accentOverride = '', notifOn = true, guestMode = false, anilistPromptDismissed = false;
     let adult18 = false, adultAnime = false, adultMovies = false, adultTv = false;
     let notifFeed = true, notifWatchlist = true, notifGame = true, feedType = 'all';
+    let compareAnimeTv = true;
     let showcaseHidden = {};
     try {
       pName = localStorage.getItem('rankit_pname') || 'Anime Fan';
@@ -1923,6 +1956,7 @@ class Component extends DCLogic {
       notifWatchlist = localStorage.getItem('rankit_notif_watchlist') !== '0';
       notifGame = localStorage.getItem('rankit_notif_game') !== '0';
       feedType = localStorage.getItem('rankit_feed_type') || 'all';
+      compareAnimeTv = localStorage.getItem('rankit_compare_anime_tv') !== '0';
       try { const sh = localStorage.getItem('rankit_showcase_hidden'); if (sh) showcaseHidden = JSON.parse(sh); } catch(e2){}
       guestMode = localStorage.getItem('rankit_guest') === '1';
       anilistPromptDismissed = localStorage.getItem('rankit_anilist_prompt_seen') === '1';
@@ -1940,7 +1974,7 @@ class Component extends DCLogic {
       titleLang: lang,
       libFilter: 'all',
       filterOpen: false, filterCtx: 'discover', filterTagQ: '', animeFormat: 'all', gameMenuOpen: false,
-      pickerOpen: false, pickType: 'all', pickGenres: [], pickTags: [], pickResult: null, pickSpinning: false, pickIncludeHold: false,
+      pickerOpen: false, pickType: 'all', pickGenres: [], pickTags: [], pickTagsEx: [], pickResult: null, pickSpinning: false, pickIncludeHold: false,
       libGenres: [], libGenresEx: [], libTags: [], libTagsEx: [],
       librarySearchQ: '',
       librarySort: 'rating', listAddType: 'all', listAddSort: 'rating', sortSheet: null,
@@ -1970,6 +2004,7 @@ class Component extends DCLogic {
       notifOn: notifOn,
       adult18: adult18, adultAnime: adultAnime, adultMovies: adultMovies, adultTv: adultTv,
       notifFeed: notifFeed, notifWatchlist: notifWatchlist, notifGame: notifGame,
+      compareAnimeTv: compareAnimeTv,
       feedType: feedType, settingsOpen: false, feedSettingsOpen: false,
       showcaseType: 'anime', showcaseHidden: showcaseHidden, showcaseEdit: false,
       appearanceOpen: false,
@@ -1996,6 +2031,9 @@ class Component extends DCLogic {
       importUsername: '',
       importDone: false,
       importCount: 0,
+      importMatching: false,
+      importMatchTotal: 0,
+      importMatchDone: 0,
     };
     this._t = null; this._pt = null; this._ft = {}; this._lastTapTs = 0; this._lt = null;
   }
@@ -2190,20 +2228,26 @@ class Component extends DCLogic {
     this.setState({ pickGenres: a, pickResult: null });
   }
   togglePickTag(t) {
-    const a = (this.state.pickTags||[]).slice(); const i = a.indexOf(t);
-    if (i>=0) a.splice(i,1); else a.push(t);
-    this.setState({ pickTags: a, pickResult: null });
+    const inc = (this.state.pickTags||[]).slice();
+    const ex = (this.state.pickTagsEx||[]).slice();
+    const iI = inc.indexOf(t), iE = ex.indexOf(t);
+    if (iI < 0 && iE < 0) inc.push(t);
+    else if (iI >= 0) { inc.splice(iI,1); ex.push(t); }
+    else ex.splice(iE,1);
+    this.setState({ pickTags: inc, pickTagsEx: ex, pickResult: null });
   }
   pickPool() {
-    const type = this.state.pickType, g = this.state.pickGenres||[], tg = this.state.pickTags||[];
+    const type = this.state.pickType, g = this.state.pickGenres||[], tg = this.state.pickTags||[], tgx = this.state.pickTagsEx||[];
     const okStatus = this.state.pickIncludeHold ? {plan:1,hold:1} : {plan:1};
     return this.state.library.filter(it => {
       if (!okStatus[it.status]) return false;
       if (type !== 'all' && it.type !== type) return false;
       const ig = this.itemGenres(it);
-      for (const x of g) if (ig.indexOf(x) < 0) return false;
+      // genre filter only excludes titles that HAVE genre data — movies/TV without genres stay eligible
+      if (g.length && ig.length) for (const x of g) if (ig.indexOf(x) < 0) return false;
       const itg = this.itemTagNames(it);
       for (const x of tg) if (itg.indexOf(x) < 0) return false;
+      for (const x of tgx) if (itg.indexOf(x) >= 0) return false;
       return true;
     });
   }
@@ -2289,6 +2333,14 @@ class Component extends DCLogic {
     const movie={Action:28,Adventure:12,Animation:16,Comedy:35,Crime:80,Documentary:99,Drama:18,Family:10751,Fantasy:14,History:36,Horror:27,Music:10402,Mystery:9648,Romance:10749,'Science Fiction':878,Thriller:53,War:10752,Western:37};
     const tv={'Action & Adventure':10759,Animation:16,Comedy:35,Crime:80,Documentary:99,Drama:18,Family:10751,Kids:10762,Mystery:9648,Reality:10764,'Sci-Fi & Fantasy':10765,'War & Politics':10768,Western:37};
     return (this.state.discSection==='movies'?movie:tv)[name];
+  }
+  // Reverse TMDB genre-id → name (so movies & TV carry genre data like anime do).
+  tmdbGenreNames(ids, kind) {
+    if(!ids||!ids.length) return [];
+    const movie={28:'Action',12:'Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',14:'Fantasy',36:'History',27:'Horror',10402:'Music',9648:'Mystery',10749:'Romance',878:'Science Fiction',53:'Thriller',10752:'War',37:'Western',10770:'TV Movie'};
+    const tv={10759:'Action & Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',10762:'Kids',9648:'Mystery',10763:'News',10764:'Reality',10765:'Sci-Fi & Fantasy',10766:'Soap',10767:'Talk',10768:'War & Politics',37:'Western'};
+    const map=kind==='tv'?tv:movie;
+    return ids.map(id=>map[id]).filter(Boolean);
   }
   // ── multi genre + tag filter ──
   // Preferred tags to surface IF AniList confirms they exist (exact canonical names only).
@@ -2570,6 +2622,11 @@ class Component extends DCLogic {
     return Math.max(0, Math.min(1, 1 - (g.rd - 50) / 300)); // rd 50→1.0, 350→0.0
   }
   ratedPool() { return this.state.library.filter(i => i.status === 'completed' && i.smart != null && i.g); }
+  // When the "compare anime with TV" setting is off, never pit an anime against a live-action TV show.
+  pairAllowed(a, b) {
+    if (this.state.compareAnimeTv) return true;
+    return !((a.type === 'anime' && b.type === 'tv') || (a.type === 'tv' && b.type === 'anime'));
+  }
   // Pick the most *informative* matchup: bias toward close ratings + high combined uncertainty.
   pickMatchup(usedKeys) {
     const pool = this.ratedPool();
@@ -2583,6 +2640,7 @@ class Component extends DCLogic {
       if (a.id === b.id) continue;
       const key = a.id < b.id ? a.id+'-'+b.id : b.id+'-'+a.id;
       if (usedKeys[key]) continue;
+      if (!this.pairAllowed(a, b)) continue;
       const gap = Math.abs(this.getG(a).r - this.getG(b).r);
       const unc = (this.getG(a).rd + this.getG(b).rd) / 2;
       // closeness (smaller gap better) + uncertainty (bigger rd better)
@@ -2593,7 +2651,7 @@ class Component extends DCLogic {
       // fallback: any unused/random pair
       const a = pool[Math.floor(Math.random()*pool.length)];
       let b = pool[Math.floor(Math.random()*pool.length)];
-      let guard=0; while (b.id===a.id && guard++<20) b = pool[Math.floor(Math.random()*pool.length)];
+      let guard=0; while ((b.id===a.id || !this.pairAllowed(a,b)) && guard++<40) b = pool[Math.floor(Math.random()*pool.length)];
       best = [a, b, a.id+'-'+b.id];
     }
     return best;
@@ -2675,7 +2733,7 @@ class Component extends DCLogic {
   pickSentiment(seed) { const s=this.state.smart; if(!s) return; s.init=seed; this.startCompare(); }
   buildPool() {
     const r=this.state.smart.init, me=this.state.smart.item;
-    const c=this.state.library.filter(i=>i.status==='completed'&&i.smart!=null&&i.id!==me.id&&Math.abs(i.smart-r)<=2.8);
+    const c=this.state.library.filter(i=>i.status==='completed'&&i.smart!=null&&i.id!==me.id&&Math.abs(i.smart-r)<=2.8&&this.pairAllowed(me,i));
     for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]];}
     return c.slice(0,4);
   }
@@ -2880,11 +2938,15 @@ class Component extends DCLogic {
       if(data){
         const desc=data.overview||'';
         const genres=(data.genres||[]).map(g=>g.name);
-        if(item.tmdbType==='tv'&&data.number_of_episodes){
-          const ei=this.state.editingItem;
-          if(ei&&ei.id===item.id) ei.totalEp=data.number_of_episodes;
+        // Backfill genre names onto the stored title so filters & the picker can use them.
+        const needBackfill=genres.length>0;
+        const lib=needBackfill?this.state.library.map(li=>(li.id===item.id&&(!li.genres||!li.genres.length))?{...li,genres}:li):this.state.library;
+        const ei=this.state.editingItem;
+        if(ei&&ei.id===item.id){
+          if(item.tmdbType==='tv'&&data.number_of_episodes) ei.totalEp=data.number_of_episodes;
+          if(needBackfill&&(!ei.genres||!ei.genres.length)) ei.genres=genres;
         }
-        this.setState({ovDescData:{description:desc,genres}});
+        this.setState({ovDescData:{description:desc,genres},library:lib},()=>{ if(needBackfill) this.persist(); });
         this.buildExtraFromTmdb(item,data);
       } else { this.setState({ovDescData:{description:'',genres:[]},ovExtra:{related:[],recs:[],guide:[],chain:[],noData:true}}); }
     } else {
@@ -2988,7 +3050,7 @@ class Component extends DCLogic {
     return {id:m.id,anilistId:null,tmdbId:m.id,tmdbType:'movie',
       title:m.title||m.original_title||'',type:'movie',
       year:m.release_date?m.release_date.slice(0,4):'',
-      genre:'',genres:[],score:m.vote_average?parseFloat(m.vote_average.toFixed(1)):null,
+      genre:'',genres:this.tmdbGenreNames(m.genre_ids,'movie'),score:m.vote_average?parseFloat(m.vote_average.toFixed(1)):null,
       cover:m.poster_path?'https://image.tmdb.org/t/p/w342'+m.poster_path:'',
       episodes:null,format:'MOVIE',isAdult:!!m.adult};
   }
@@ -2996,7 +3058,7 @@ class Component extends DCLogic {
     return {id:t.id,anilistId:null,tmdbId:t.id,tmdbType:'tv',
       title:t.name||t.original_name||'',type:'tv',
       year:t.first_air_date?t.first_air_date.slice(0,4):'',
-      genre:'',genres:[],score:t.vote_average?parseFloat(t.vote_average.toFixed(1)):null,
+      genre:'',genres:this.tmdbGenreNames(t.genre_ids,'tv'),score:t.vote_average?parseFloat(t.vote_average.toFixed(1)):null,
       cover:t.poster_path?'https://image.tmdb.org/t/p/w342'+t.poster_path:'',
       episodes:t.number_of_episodes||null,format:'TV',isAdult:!!t.adult};
   }
@@ -3122,6 +3184,10 @@ class Component extends DCLogic {
     this.setState({ showcaseHidden: h }, () => this.persistShowcaseHidden());
   }
   // ── adult / 18+ content ──
+  toggleCompareAnimeTv() {
+    const v = !this.state.compareAnimeTv;
+    this.setState({ compareAnimeTv: v }, () => { try { localStorage.setItem('rankit_compare_anime_tv', v ? '1' : '0'); } catch(e){} });
+  }
   toggleAdult18() {
     const v = !this.state.adult18;
     const next = { adult18: v };
@@ -3287,7 +3353,7 @@ class Component extends DCLogic {
   closeReset() { this.setState({resetConfirmOpen:false}); }
   doReset() {
     try {
-      ['rankit_lib_v4','rankit_lists_v1','rankit_pname','rankit_pemoji','rankit_lang','rankit_tmdb_key','rankit_accent','rankit_notif','rankit_feed_dismissed','rankit_adult18','rankit_adult_anime','rankit_adult_movies','rankit_adult_tv','rankit_notif_feed','rankit_notif_watchlist','rankit_notif_game','rankit_feed_type','rankit_showcase_hidden'].forEach(k=>localStorage.removeItem(k));
+      ['rankit_lib_v4','rankit_lists_v1','rankit_pname','rankit_pemoji','rankit_lang','rankit_tmdb_key','rankit_accent','rankit_notif','rankit_feed_dismissed','rankit_adult18','rankit_adult_anime','rankit_adult_movies','rankit_adult_tv','rankit_notif_feed','rankit_notif_watchlist','rankit_notif_game','rankit_feed_type','rankit_showcase_hidden','rankit_compare_anime_tv'].forEach(k=>localStorage.removeItem(k));
     } catch(e){}
     this.setState({
       library:[], lists:[], tab:'library',
@@ -3409,7 +3475,7 @@ class Component extends DCLogic {
   async fetchAnilistImport() {
     const username=this.state.importUsername.trim(); if(!username) return;
     this.setState({importLoading:true,importError:'',importPreview:null,importDone:false});
-    const Q='query ($n:String){MediaListCollection(userName:$n,type:ANIME){lists{entries{status score progress media{id title{romaji english native} coverImage{large} episodes format seasonYear genres averageScore}}}}}';
+    const Q='query ($n:String){MediaListCollection(userName:$n,type:ANIME){lists{entries{status score progress media{id title{romaji english native} coverImage{large} episodes format seasonYear genres averageScore tags{name rank isMediaSpoiler}}}}}}';
     const data=await this.query(Q,{n:username});
     if(data&&data.MediaListCollection){
       const statusMap={CURRENT:'watching',COMPLETED:'completed',PLANNING:'plan',PAUSED:'hold',DROPPED:'hold',REPEATING:'watching'};
@@ -3421,18 +3487,43 @@ class Component extends DCLogic {
         if(score) score=Math.round(score*10)/10;
         const type=m.format==='MOVIE'?'movie':'anime';
         const title=m.title.english||m.title.romaji||m.title.native||'';
-        return{id:Date.now()+Math.random(),anilistId:m.id,tmdbId:null,tmdbType:null,title,season:'',year:m.seasonYear||'',type,em:'',cover:(m.coverImage&&m.coverImage.large)||'',genres:m.genres||[],score:m.averageScore?m.averageScore/10:null,status:statusMap[e.status]||'plan',smart:score,init:score,ep:e.progress||0,totalEp:m.episodes||null};
+        return{id:Date.now()+Math.random(),anilistId:m.id,tmdbId:null,tmdbType:null,title,season:'',year:m.seasonYear||'',type,em:'',cover:(m.coverImage&&m.coverImage.large)||'',genres:m.genres||[],tags:this.topTags(m),score:m.averageScore?m.averageScore/10:null,status:statusMap[e.status]||'plan',smart:score,init:score,ep:e.progress||0,totalEp:m.episodes||null};
       });
       this.setState({importPreview:items,importLoading:false,importError:''});
     } else {
       this.setState({importLoading:false,importError:"User not found or list is private. Make sure your anime list is set to public in AniList settings."});
     }
   }
-  doImport() {
+  // Look a Letterboxd film up on TMDB to attach its id, genres and poster.
+  async matchLetterboxdMovie(item){
+    const params={query:item.title};
+    if(item.year) params.year=item.year;
+    const data=await this.tmdbQuery('/search/movie',params);
+    const r=data&&data.results&&data.results.length?data.results[0]:null;
+    if(!r) return item;
+    return {...item, tmdbId:r.id, tmdbType:'movie',
+      genres:this.tmdbGenreNames(r.genre_ids,'movie'),
+      cover:r.poster_path?('https://image.tmdb.org/t/p/w342'+r.poster_path):(item.cover||'')};
+  }
+  async doImport(){
     const preview=this.state.importPreview; if(!preview||!preview.length) return;
-    const lib=this.state.library;
     const isAnilist=this.state.importTab==='anilist';
-    const newItems=preview.filter(it=>{
+    let items=preview;
+    // Letterboxd films arrive as bare titles — enrich them with TMDB genres + covers before committing.
+    if(!isAnilist && (this.state.tmdbKey||this.state.backendAvailable)){
+      const toMatch=preview.filter(it=>it.type==='movie' && !it.tmdbId && it.title);
+      if(toMatch.length){
+        this.setState({importMatching:true, importMatchTotal:toMatch.length, importMatchDone:0});
+        const enriched=new Map(); let done=0;
+        const queue=toMatch.slice();
+        const worker=async()=>{ while(queue.length){ const it=queue.shift(); let m=it; try{ m=await this.matchLetterboxdMovie(it); }catch(e){} enriched.set(it,m); done++; if(done%3===0||done===toMatch.length) this.setState({importMatchDone:done}); } };
+        await Promise.all(Array.from({length:6}, worker));
+        items=preview.map(it=>enriched.get(it)||it);
+        this.setState({importMatching:false});
+      }
+    }
+    const lib=this.state.library;
+    const newItems=items.filter(it=>{
       if(isAnilist) return !lib.some(l=>l.anilistId&&l.anilistId===it.anilistId);
       return !lib.some(l=>l.title.toLowerCase()===it.title.toLowerCase()&&l.year===it.year);
     });
@@ -3882,6 +3973,11 @@ class Component extends DCLogic {
       // adult / 18+
       adult18:st.adult18, adultLocked:!st.adult18,
       onToggleAdult18:()=>this.toggleAdult18(),
+      compareAnimeTv:st.compareAnimeTv,
+      onToggleCompareAnimeTv:()=>this.toggleCompareAnimeTv(),
+      compareAnimeTvColor:st.compareAnimeTv?'var(--accent)':'#8E8E98',
+      compareAnimeTvBg:st.compareAnimeTv?'var(--accent)':'#2A2A31',
+      compareAnimeTvKnob:st.compareAnimeTv?'20px':'3px',
       adult18Color:st.adult18?'var(--accent)':'#8E8E98',
       adult18Bg:st.adult18?'var(--accent)':'#2A2A31', adult18Knob:st.adult18?'20px':'3px',
       onToggleAdultAnime:()=>this.toggleAdultType('anime'),
@@ -3950,7 +4046,7 @@ class Component extends DCLogic {
       pickSpinLabel:st.pickSpinning?'Spinning…':(st.pickResult&&st.pickResult.item&&!st.pickResult.spinning?'Spin again':'Spin'),
       pickTypeChips:(()=>{const mk=(k,label)=>{const a=(st.pickType||'all')===k;const p=this.pillStyle(a);return{label,...p,on:()=>this.setPickType(k)};};return[mk('all','Any'),mk('movie','Movies'),mk('tv','TV'),mk('anime','Anime')];})(),
       pickGenreChips:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};const set={};st.library.filter(i=>ok[i.status]).forEach(i=>this.itemGenres(i).forEach(g=>{if(g)set[g]=1;}));return Object.keys(set).sort().map(g=>{const a=(st.pickGenres||[]).indexOf(g)>=0;const p=this.pillStyle(a);return{label:g,...p,on:()=>this.togglePickGenre(g)};});})(),
-      pickTagChips:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};const set={};st.library.filter(i=>ok[i.status]).forEach(i=>this.itemTagNames(i).forEach(t=>{if(t)set[t]=1;}));return Object.keys(set).sort().slice(0,24).map(t=>{const a=(st.pickTags||[]).indexOf(t)>=0;const p=this.pillStyle(a);return{label:t,...p,on:()=>this.togglePickTag(t)};});})(),
+      pickTagChips:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};const set={};st.library.filter(i=>ok[i.status]).forEach(i=>this.itemTagNames(i).forEach(t=>{if(t)set[t]=1;}));return Object.keys(set).sort().slice(0,24).map(t=>{const inc=(st.pickTags||[]).indexOf(t)>=0;const exc=(st.pickTagsEx||[]).indexOf(t)>=0;const s=chipState(inc,exc);return{label:t,...s,on:()=>this.togglePickTag(t)};});})(),
       pickHasGenres:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};return st.library.filter(i=>ok[i.status]).some(i=>this.itemGenres(i).length>0);})(),
       pickHasTags:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};return st.library.filter(i=>ok[i.status]).some(i=>this.itemTagNames(i).length>0);})(),
       pickPoolLabel:(()=>{const n=this.pickPool().length;return n+' title'+(n!==1?'s':'')+' match';})(),
@@ -4229,7 +4325,8 @@ class Component extends DCLogic {
       onSignOut: ()=>this.signOut(),
       // profile identity
       signedInAnilist: !!st.anilistUser,
-      guestProfile: !st.anilistUser,
+      accountProfile: !st.anilistUser && !!st.account,
+      guestProfile: !st.anilistUser && !st.account,
       anilistAvatar: st.anilistUser && st.anilistUser.avatar ? st.anilistUser.avatar.large : '',
       anilistAvatarBg: (st.anilistUser && st.anilistUser.avatar && st.anilistUser.avatar.large) ? ('center/cover no-repeat url("'+st.anilistUser.avatar.large+'")') : '#222229',
       anilistConnected: !!st.anilistToken,
@@ -4271,6 +4368,10 @@ class Component extends DCLogic {
       importError: st.importError||'',
       importHasPreview: !!(st.importPreview&&st.importPreview.length>0&&!st.importDone),
       importDone: st.importDone,
+      importMatching: st.importMatching||false,
+      importNotMatching: !st.importMatching,
+      importMatchProgress: (st.importMatchDone||0)+' / '+(st.importMatchTotal||0),
+      importMatchPct: st.importMatchTotal?Math.round((st.importMatchDone||0)/st.importMatchTotal*100):0,
       importDoneLabel: (()=>{
         const c=st.importCount;
         const skipped=(st.importPreview?0:0);
