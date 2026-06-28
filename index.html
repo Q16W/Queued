@@ -588,21 +588,45 @@
       </sc-if>
       <sc-if value="{{ feedReady }}" hint-placeholder-val="{{ false }}">
         <div>
-          <div style="display:flex; align-items:center; justify-content:space-between; margin:10px 4px 12px;">
-            <div style="font-family:'Space Mono'; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#5A5A63;">{{ feedSectionLabel }}</div>
-            <div style="font-size:11px; color:#5A5A63; display:flex; align-items:center; gap:5px;"><i class="ti ti-swipe" style="font-size:13px;"></i>Swipe to dismiss</div>
+          <div class="rk-scroll" style="display:flex; gap:7px; overflow-x:auto; padding:4px 4px 12px;">
+            <sc-for list="{{ feedFilterPills }}" as="p" hint-placeholder-count="5">
+              <button onClick="{{ p.on }}" style="flex:none; padding:6px 15px; border-radius:999px; font-family:'Hanken Grotesk'; font-weight:600; font-size:12.5px; cursor:pointer; white-space:nowrap; background:{{ p.bg }}; color:{{ p.fg }}; border:1px solid {{ p.bd }};">{{ p.label }}</button>
+            </sc-for>
           </div>
-          <sc-for list="{{ feed }}" as="f" hint-placeholder-count="5">
-            <div onTouchStart="{{ f.onTouchStart }}" onTouchMove="{{ f.onTouchMove }}" onTouchEnd="{{ f.onTouchEnd }}" onClick="{{ f.onTap }}" style="display:flex; gap:13px; padding:13px 14px; background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:14px; margin-bottom:9px; cursor:pointer; touch-action:pan-y; will-change:transform;">
-              <div style="width:46px; height:46px; border-radius:10px; flex:none; background:{{ f.bg }}; background-size:cover; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff;">{{ f.em }}</div>
-              <div style="flex:1; min-width:0;">
-                <div style="font-size:14px; font-weight:600; line-height:1.3;">{{ f.title }}</div>
-                <div style="font-size:12.5px; color:#8E8E98; margin-top:4px; line-height:1.4;">{{ f.sub }}</div>
-                <div style="display:flex; align-items:center; gap:9px; margin-top:8px;">
-                  <span style="font-family:'Space Mono'; font-size:9px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 8px; border-radius:999px; background:rgba(200,240,60,0.13); color:var(--accent);">New EP</span>
-                  <span style="font-size:11px; color:#5A5A63; display:flex; align-items:center; gap:4px;"><i class="ti ti-plus" style="font-size:11px;"></i>Add to library</span>
-                </div>
+          <sc-for list="{{ feedGroups }}" as="g" hint-placeholder-count="2">
+            <div style="margin-bottom:18px;">
+              <div style="display:flex; align-items:center; gap:9px; margin:6px 4px 11px;">
+                <div style="font-family:'Space Mono'; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#5A5A63;">{{ g.label }}</div>
+                <div style="height:1px; flex:1; background:rgba(255,255,255,0.07);"></div>
+                <div style="font-family:'Space Mono'; font-size:10px; color:#5A5A63;">{{ g.countText }}</div>
               </div>
+              <sc-for list="{{ g.items }}" as="f" hint-placeholder-count="3">
+                <div onTouchStart="{{ f.onTouchStart }}" onTouchMove="{{ f.onTouchMove }}" onTouchEnd="{{ f.onTouchEnd }}" onClick="{{ f.onTap }}" style="position:relative; opacity:{{ f.cardOpacity }}; background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:15px; margin-bottom:9px; cursor:pointer; touch-action:pan-y; will-change:transform; overflow:hidden;">
+                  <div style="display:flex; gap:13px; padding:13px 14px 11px;">
+                    <div style="width:50px; height:67px; border-radius:9px; flex:none; background:{{ f.bg }}; background-size:cover; display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff;">{{ f.em }}</div>
+                    <div style="flex:1; min-width:0;">
+                      <sc-if value="{{ f.isFriend }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex; align-items:center; gap:7px; margin-bottom:4px;">
+                          <div style="width:20px; height:20px; border-radius:50%; flex:none; background:{{ f.friendBg }}; display:flex; align-items:center; justify-content:center; font-size:12px;">{{ f.friendEmoji }}</div>
+                          <div style="font-size:12px; color:#C7C7CE; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"><span style="font-weight:700; color:#F4F4F2;">{{ f.friendName }}</span> {{ f.friendAction }}</div>
+                        </div>
+                      </sc-if>
+                      <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-bottom:3px;">
+                        <sc-if value="{{ f.showBadge }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex; align-items:center; gap:4px; font-family:'Space Mono'; font-size:8.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 8px; border-radius:999px; background:{{ f.badgeBg }}; color:{{ f.badgeFg }};"><i class="{{ f.badgeIcon }}" style="font-size:10px;"></i>{{ f.badgeLabel }}</span></sc-if>
+                        <sc-if value="{{ f.hasTime }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px; font-weight:600; color:{{ f.timeColor }};">{{ f.timeText }}</span></sc-if>
+                      </div>
+                      <div style="font-size:14.5px; font-weight:600; line-height:1.25; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">{{ f.title }}</div>
+                      <div style="font-size:12px; color:#8E8E98; margin-top:3px;"><sc-if value="{{ f.hasSub }}" hint-placeholder-val="{{ true }}">{{ f.sub }} · </sc-if><span style="color:#5A5A63;">{{ f.typeLabel }}</span></div>
+                    </div>
+                    <sc-if value="{{ f.watched }}" hint-placeholder-val="{{ false }}"><div style="position:absolute; top:11px; right:12px; width:22px; height:22px; border-radius:50%; background:color-mix(in srgb, var(--accent) 18%, transparent); display:flex; align-items:center; justify-content:center;"><i class="ti ti-check" style="font-size:13px; color:var(--accent);"></i></div></sc-if>
+                  </div>
+                  <div style="display:flex; gap:8px; padding:0 14px 13px;">
+                    <sc-for list="{{ f.actions }}" as="a" hint-placeholder-count="2">
+                      <button onClick="{{ a.on }}" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:8px 10px; border-radius:10px; background:{{ a.bg }}; color:{{ a.fg }}; border:1px solid {{ a.bd }}; font-family:'Hanken Grotesk'; font-weight:600; font-size:12.5px; cursor:pointer; white-space:nowrap;"><i class="{{ a.icon }}" style="font-size:15px;"></i>{{ a.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
             </div>
           </sc-for>
           <sc-if value="{{ feedAllDismissed }}" hint-placeholder-val="{{ false }}">
@@ -626,10 +650,6 @@
         <div style="display:inline-flex; align-items:center; gap:7px;">
           <span style="font-family:'Space Grotesk'; font-weight:700; font-size:21px; letter-spacing:-0.03em;">{{ anilistUsername }}</span>
         </div>
-        <div style="display:inline-flex; align-items:center; gap:5px; margin:6px auto 0; padding:3px 10px; border-radius:999px; background:rgba(31,191,122,0.12); border:1px solid rgba(31,191,122,0.25);">
-          <i class="ti ti-brand-anilist" style="font-size:12px; color:#1FBF7A;"></i>
-          <span style="font-size:11px; font-weight:600; color:#1FBF7A;">Signed in with AniList</span>
-        </div>
         <div style="font-size:13px; color:#8E8E98; margin-top:8px;">{{ libCountText }}</div>
       </sc-if>
       <sc-if value="{{ accountProfile }}" hint-placeholder-val="{{ false }}">
@@ -643,10 +663,6 @@
         </sc-if>
         <div style="display:inline-flex; align-items:center; gap:7px;">
           <span style="font-family:'Space Grotesk'; font-weight:700; font-size:21px; letter-spacing:-0.03em;">{{ accountName }}</span>
-        </div>
-        <div style="display:inline-flex; align-items:center; gap:5px; margin:6px auto 0; padding:3px 10px; border-radius:999px; background:rgba(31,191,122,0.12); border:1px solid rgba(31,191,122,0.25);">
-          <i class="ti ti-cloud-check" style="font-size:12px; color:#1FBF7A;"></i>
-          <span style="font-size:11px; font-weight:600; color:#1FBF7A;">Signed in</span>
         </div>
         <div style="font-size:13px; color:#8E8E98; margin-top:8px;">{{ libCountText }}</div>
       </sc-if>
@@ -877,7 +893,10 @@
       </sc-if>
       <sc-if value="{{ edit.hasDesc }}" hint-placeholder-val="{{ false }}">
         <div style="padding:12px 14px; background:#15151A; border-radius:12px; border:1px solid rgba(255,255,255,0.06); margin-bottom:16px;">
-          <div class="rk-clamp4" style="font-size:13px; color:#8E8E98; line-height:1.65;">{{ edit.description }}</div>
+          <div class="{{ descClampClass }}" style="font-size:13px; color:#8E8E98; line-height:1.65;">{{ edit.description }}</div>
+          <sc-if value="{{ descIsLong }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onToggleDesc }}" style="display:inline-flex; align-items:center; gap:5px; margin-top:9px; cursor:pointer; color:var(--accent); font-size:12.5px; font-weight:700;">{{ descToggleLabel }}<i class="ti {{ descToggleIcon }}" style="font-size:14px;"></i></div>
+          </sc-if>
         </div>
       </sc-if>
       <!-- TAGS (major info tool) -->
@@ -967,14 +986,13 @@
       <div style="margin-bottom:18px;">
         <div style="display:flex; align-items:center; gap:7px; margin-bottom:10px;"><i class="ti ti-map-2" style="font-size:16px; color:var(--accent);"></i><span style="font-size:14px; font-weight:700;">Watch guide</span></div>
         <sc-if value="{{ hasChain }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex; flex-direction:column; gap:7px; margin-bottom:12px;">
-          <sc-for list="{{ guideChain }}" as="ch" hint-placeholder-count="2">
-            <div onClick="{{ ch.onTap }}" style="display:flex; align-items:center; gap:11px; padding:9px 11px; background:{{ ch.rowBg }}; border:1px solid {{ ch.rowBd }}; border-radius:12px; cursor:{{ ch.cursor }};">
-              <div style="font-family:'Space Mono'; font-size:9px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:{{ ch.labelColor }}; width:74px; flex:none;">{{ ch.label }}</div>
-              <div style="width:30px; height:42px; border-radius:6px; flex:none; background:{{ ch.bg }}; background-size:cover; display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff;">{{ ch.em }}</div>
-              <div style="flex:1; min-width:0;">
-                <div style="font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:{{ ch.titleColor }};">{{ ch.title }}</div>
-                <div style="font-size:11px; color:#8E8E98; margin-top:2px;">{{ ch.meta }}</div>
+        <div class="rk-scroll" style="display:flex; gap:10px; overflow-x:auto; margin-bottom:12px; padding-bottom:4px;">
+          <sc-for list="{{ guideChain }}" as="ch" hint-placeholder-count="3">
+            <div onClick="{{ ch.onTap }}" style="min-width:118px; width:118px; flex:none; background:{{ ch.rowBg }}; border:1px solid {{ ch.rowBd }}; border-radius:13px; overflow:hidden; cursor:{{ ch.cursor }};">
+              <div style="height:150px; background:{{ ch.bg }}; background-size:cover; display:flex; align-items:center; justify-content:center; font-size:38px; color:#fff; position:relative;">{{ ch.em }}<span style="position:absolute; top:6px; left:6px; padding:2px 7px; background:rgba(13,13,16,0.82); border-radius:999px; font-size:8.5px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:{{ ch.labelColor }};">{{ ch.label }}</span></div>
+              <div style="padding:8px 9px 10px;">
+                <div style="font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:{{ ch.titleColor }};">{{ ch.title }}</div>
+                <div style="font-size:10.5px; color:#8E8E98; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ ch.meta }}</div>
               </div>
             </div>
           </sc-for>
@@ -990,6 +1008,21 @@
           </div>
         </div>
         </sc-if>
+      </div>
+      </sc-if>
+      <!-- Characters & cast -->
+      <sc-if value="{{ hasCharacters }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-bottom:18px;">
+        <div style="display:flex; align-items:center; gap:7px; margin-bottom:11px;"><i class="ti ti-users" style="font-size:16px; color:var(--accent);"></i><span style="font-size:14px; font-weight:700;">{{ castTitle }}</span></div>
+        <div class="rk-scroll" style="display:flex; gap:12px; overflow-x:auto; padding-bottom:4px;">
+          <sc-for list="{{ characterCards }}" as="c" hint-placeholder-count="4">
+            <div style="min-width:78px; width:78px; flex:none; text-align:center;">
+              <div style="width:78px; height:78px; border-radius:50%; background:{{ c.bg }}; background-size:cover; display:flex; align-items:center; justify-content:center; font-size:30px; color:#fff; margin-bottom:7px;">{{ c.em }}</div>
+              <div style="font-size:11.5px; font-weight:600; line-height:1.25; white-space:normal; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">{{ c.name }}</div>
+              <sc-if value="{{ c.hasSub }}" hint-placeholder-val="{{ false }}"><div style="font-size:10px; color:#5A5A63; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ c.sub }}</div></sc-if>
+            </div>
+          </sc-for>
+        </div>
       </div>
       </sc-if>
       <!-- Related -->
@@ -1542,6 +1575,20 @@
   </div>
   </sc-if>
 
+  <!-- ════════ CONTENT & MATURITY OVERLAY ════════ -->
+  <sc-if value="{{ contentMaturityOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="rk-scroll" style="position:absolute; inset:0; z-index:175; background:#0D0D10; overflow-y:auto; animation:rk-in .22s ease;">
+    <div style="position:sticky; top:0; z-index:10; background:#0D0D10; display:flex; align-items:center; gap:12px; padding:56px 16px 14px; border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div onClick="{{ onCloseContentMaturity }}" style="width:36px; height:36px; border-radius:999px; background:#222229; display:flex; align-items:center; justify-content:center; color:#8E8E98; cursor:pointer; flex:none;"><i class="ti ti-arrow-left"></i></div>
+      <div style="font-family:'Space Grotesk'; font-weight:700; font-size:18px; letter-spacing:-0.02em;">Content &amp; maturity</div>
+    </div>
+    <div style="padding:16px 16px 40px;">
+      <div style="font-size:12.5px; color:#8E8E98; line-height:1.55; margin:0 2px 16px;">Control whether adult (18+) titles and sexual tags appear anywhere in the app — Discover, Library and the feed.</div>
+      <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;"><div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-shield-lock" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Content &amp; maturity</span></div><div onClick="{{ onToggleAdult18 }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-circle-letter-r" style="font-size:18px; color:{{ adult18Color }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Show 18+ content</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Unlocks sexual tags &amp; adult titles</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ adult18Bg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adult18Knob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><sc-if value="{{ adult18 }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:8px 16px 2px 22px;">Show adult titles in</div><div onClick="{{ onToggleAdultAnime }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-broadcast" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Anime</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultAnimeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultAnimeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultMovies }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-movie" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Movies</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultMoviesBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultMoviesKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultTv }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-device-tv" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">TV shows</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultTvKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-if><sc-if value="{{ adultLocked }}" hint-placeholder-val="{{ true }}"><div style="padding:10px 16px 14px; font-size:11.5px; color:#5A5A63; line-height:1.5; border-top:1px solid rgba(255,255,255,0.05);">Sexual tags and adult titles stay hidden across Discover &amp; Library until you turn this on.</div></sc-if></div>
+    </div>
+  </div>
+  </sc-if>
+
   <!-- APPEARANCE SHEET -->
   <sc-if value="{{ appearanceOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ onCloseAppearance }}" style="position:absolute; inset:0; z-index:250; background:rgba(0,0,0,0.6); display:flex; align-items:flex-end; animation:rk-in .18s ease;">
@@ -1663,6 +1710,13 @@
           <div style="flex:1;"><div style="font-size:14.5px; font-weight:600; color:{{ feedTypeWatchFg }};">My watchlist</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Only airing titles in your library</div></div>
           <sc-if value="{{ feedTypeWatchOn }}" hint-placeholder-val="{{ false }}"><i class="ti ti-check" style="font-size:18px; color:var(--accent);"></i></sc-if>
         </div>
+        <div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:18px 4px 8px;">Event types</div>
+        <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:13px; overflow:hidden;">
+          <div onClick="{{ onToggleEvEpisode }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06);"><i class="ti ti-player-play-filled" style="font-size:17px; color:var(--accent); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">New episodes</span><div style="width:40px; height:23px; border-radius:999px; background:{{ feedEvEpisodeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ feedEvEpisodeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+          <div onClick="{{ onToggleEvSeason }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06);"><i class="ti ti-sparkles" style="font-size:17px; color:#5BD7E0; width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">Premieres &amp; new seasons</span><div style="width:40px; height:23px; border-radius:999px; background:{{ feedEvSeasonBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ feedEvSeasonKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+          <div onClick="{{ onToggleEvRelease }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06);"><i class="ti ti-confetti" style="font-size:17px; color:#F0C24E; width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">Releases</span><div style="width:40px; height:23px; border-radius:999px; background:{{ feedEvReleaseBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ feedEvReleaseKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+          <div onClick="{{ onToggleEvFriend }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer;"><i class="ti ti-users" style="font-size:17px; color:#df6bff; width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">Friends' activity</span><div style="width:40px; height:23px; border-radius:999px; background:{{ feedEvFriendBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ feedEvFriendKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+        </div>
         <div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:18px 4px 8px;">Show in feed</div>
         <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:13px; overflow:hidden;">
           <div onClick="{{ onToggleFeedAnime }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.06);"><i class="ti ti-broadcast" style="font-size:18px; color:var(--accent); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">Anime</span><div style="width:40px; height:23px; border-radius:999px; background:{{ feedAnimeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ feedAnimeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
@@ -1677,7 +1731,6 @@
           <div onClick="{{ onToggleNotifTv }}" style="display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer;"><i class="ti ti-device-tv" style="font-size:18px; color:var(--tc-tv); width:24px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:600;">TV shows</span><div style="width:40px; height:23px; border-radius:999px; background:{{ notifMediaTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifMediaTvKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
         </div>
         <div style="font-size:11px; color:#5A5A63; line-height:1.5; margin-top:9px; padding:0 2px;">Only get release &amp; episode alerts for the types you care about.</div>
-        <div onClick="{{ onOpenSettingsFromFeed }}" style="display:flex; align-items:center; gap:10px; padding:13px 14px; margin-top:14px; border-radius:13px; background:rgba(255,255,255,0.04); cursor:pointer;"><i class="ti ti-bell" style="font-size:17px; color:#8E8E98;"></i><span style="flex:1; font-size:13.5px; font-weight:500; color:#C7C7CE;">More notification settings</span><i class="ti ti-chevron-right" style="color:#5A5A63;"></i></div>
       </div>
     </div>
   </sc-if>
@@ -1722,8 +1775,7 @@
           </div>
         </sc-if>
       </sc-if>
-      <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;"><div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-shield-lock" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Content &amp; maturity</span></div><div onClick="{{ onToggleAdult18 }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-circle-letter-r" style="font-size:18px; color:{{ adult18Color }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Show 18+ content</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Unlocks sexual tags &amp; adult titles</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ adult18Bg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adult18Knob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><sc-if value="{{ adult18 }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5A5A63; padding:8px 16px 2px 22px;">Show adult titles in</div><div onClick="{{ onToggleAdultAnime }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-broadcast" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Anime</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultAnimeBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultAnimeKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultMovies }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-movie" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">Movies</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultMoviesBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultMoviesKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleAdultTv }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-device-tv" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><span style="flex:1; font-size:13.5px; font-weight:500;">TV shows</span><div style="width:40px; height:23px; border-radius:999px; background:{{ adultTvBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ adultTvKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-if><sc-if value="{{ adultLocked }}" hint-placeholder-val="{{ true }}"><div style="padding:10px 16px 14px; font-size:11.5px; color:#5A5A63; line-height:1.5; border-top:1px solid rgba(255,255,255,0.05);">Sexual tags and adult titles stay hidden across Discover &amp; Library until you turn this on.</div></sc-if></div>
-      <div style="height:14px;"></div>
+      
       <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; margin-bottom:14px;">
         <div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;"><i class="ti ti-sparkles" style="font-size:16px; color:var(--accent);"></i><span style="flex:1; font-size:14px; font-weight:700;">Library</span></div>
         <div onClick="{{ onToggleSmartRating }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; cursor:pointer;"><i class="ti ti-stars" style="font-size:18px; color:{{ smartRatingColor }}; width:26px; text-align:center;"></i><div style="flex:1;"><div style="font-size:14px; font-weight:500;">Smart rating</div><div style="font-size:11.5px; color:#8E8E98; margin-top:2px;">Refine each score with quick head-to-head comparisons. Off uses your gut rating directly.</div></div><div style="width:42px; height:25px; border-radius:999px; background:{{ smartRatingBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ smartRatingKnob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
@@ -1741,6 +1793,7 @@
       </div>
       <div style="background:#15151A; border:1px solid rgba(255,255,255,0.07); border-radius:16px; overflow:hidden;">
         <div onClick="{{ onOpenAppearance }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;"><i class="ti ti-palette" style="font-size:18px; color:var(--accent); width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500;">Appearance</span><i class="ti ti-chevron-right" style="color:#5A5A63;"></i></div>
+        <div onClick="{{ onOpenContentMaturity }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;"><i class="ti ti-shield-lock" style="font-size:18px; color:var(--accent); width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500;">Content &amp; maturity</span><sc-if value="{{ adult18 }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px; padding:2px 8px; border-radius:999px; background:rgba(200,240,60,0.12); color:var(--accent); font-weight:600; margin-right:8px;">18+ on</span></sc-if><i class="ti ti-chevron-right" style="color:#5A5A63;"></i></div>
         <div onClick="{{ onToggleNotif }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;"><i class="ti ti-bell" style="font-size:18px; color:var(--accent); width:26px; text-align:center;"></i><span style="flex:1; font-size:14px; font-weight:500;">Notifications</span><div style="width:42px; height:25px; border-radius:999px; background:{{ notifBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifKnob }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><sc-if value="{{ notifOn }}" hint-placeholder-val="{{ true }}"><div onClick="{{ onToggleNotifFeed }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-broadcast" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><div style="flex:1;"><div style="font-size:13.5px; font-weight:500;">New episodes</div><div style="font-size:11px; color:#8E8E98; margin-top:1px;">Airing updates from the general feed</div></div><div style="width:40px; height:23px; border-radius:999px; background:{{ notifFeedBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifFeedKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleNotifWatchlist }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-bookmark" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><div style="flex:1;"><div style="font-size:13.5px; font-weight:500;">Watchlist updates</div><div style="font-size:11px; color:#8E8E98; margin-top:1px;">Only titles on your watchlist</div></div><div style="width:40px; height:23px; border-radius:999px; background:{{ notifWatchlistBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifWatchlistKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div><div onClick="{{ onToggleNotifGame }}" style="display:flex; align-items:center; gap:13px; padding:12px 16px 12px 22px; cursor:pointer; border-top:1px solid rgba(255,255,255,0.05);"><i class="ti ti-swords" style="font-size:16px; color:#8E8E98; width:24px; text-align:center;"></i><div style="flex:1;"><div style="font-size:13.5px; font-weight:500;">Rating game reminders</div><div style="font-size:11px; color:#8E8E98; margin-top:1px;">Daily Five streak nudges</div></div><div style="width:40px; height:23px; border-radius:999px; background:{{ notifGameBg }}; position:relative; flex:none; transition:background .2s;"><div style="position:absolute; top:3px; left:{{ notifGameKnob }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-if>
         <!-- TMDB connect row -->
         <div>
@@ -1952,8 +2005,11 @@
         <div style="text-align:center; padding:18px; color:#8E8E98; font-size:14px; background:#1C1C22; border-radius:14px; margin-bottom:16px;">Nothing in your To-Watch list matches these filters.</div>
         </sc-if>
       </div>
-      <div style="padding:4px 18px 0;">
-        <button onClick="{{ onSpin }}" style="width:100%; padding:16px; border-radius:14px; background:var(--accent); color:#0D0D10; border:none; font-family:'Hanken Grotesk'; font-size:16px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px;"><i class="ti ti-dice-5" style="font-size:19px;"></i>{{ pickSpinLabel }}</button>
+      <div style="position:sticky; bottom:0; background:linear-gradient(transparent, #15151A 38%); padding:14px 18px 18px; display:flex; gap:9px;">
+        <sc-if value="{{ pickHasFilters }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ onClearPicker }}" style="flex:none; padding:16px 18px; border-radius:14px; background:transparent; color:#F4F4F2; border:1px solid rgba(255,255,255,0.18); font-family:'Hanken Grotesk'; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;"><i class="ti ti-eraser" style="font-size:17px;"></i>Clear</button>
+        </sc-if>
+        <button onClick="{{ onSpin }}" style="flex:1; padding:16px; border-radius:14px; background:var(--accent); color:#0D0D10; border:none; font-family:'Hanken Grotesk'; font-size:16px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px;"><i class="ti ti-dice-5" style="font-size:19px;"></i>{{ pickSpinLabel }}</button>
       </div>
     </div>
   </div>
@@ -2009,12 +2065,14 @@ class Component extends DCLogic {
     let notifFeed = true, notifWatchlist = true, notifGame = true, feedType = 'all';
     let gameTypes = { anime:true, movie:true, tv:true };
     let smartRatingEnabled = true;
-    let feedMedia = { anime:true, movie:false, tv:false };
+    let feedMedia = { anime:false, movie:true, tv:true };
     let feedMediaSaved = false;
     let notifMedia = { anime:true, movie:true, tv:true };
     let feedSetupSeen = false;
     let smartCrossType = true;
     let showcaseHidden = {};
+    let feedEvents = { episode:true, season:true, release:true, friend:true };
+    let feedReminders = {}, feedWatched = {}, feedFilter = 'all';
     try {
       pName = localStorage.getItem('rankit_pname') || 'Anime Fan';
       pEmoji = localStorage.getItem('rankit_pemoji') || '🎬';
@@ -2031,9 +2089,12 @@ class Component extends DCLogic {
       notifGame = localStorage.getItem('rankit_notif_game') !== '0';
       feedType = localStorage.getItem('rankit_feed_type') || 'all';
       smartRatingEnabled = localStorage.getItem('rankit_smart_rating') !== '0';
-      try { const fmj = localStorage.getItem('rankit_feed_media'); if (fmj) { feedMedia = Object.assign({ anime:true, movie:false, tv:false }, JSON.parse(fmj)); feedMediaSaved = true; } } catch(e4){}
+      try { const fmj = localStorage.getItem('rankit_feed_media'); if (fmj) { feedMedia = Object.assign({ anime:false, movie:true, tv:true }, JSON.parse(fmj)); feedMediaSaved = true; } } catch(e4){}
       try { const nm = localStorage.getItem('rankit_notif_media'); if (nm) notifMedia = Object.assign({ anime:true, movie:true, tv:true }, JSON.parse(nm)); } catch(e5){}
       feedSetupSeen = localStorage.getItem('rankit_feed_setup') === '1';
+      try { const fe = localStorage.getItem('rankit_feed_events'); if (fe) feedEvents = Object.assign({ episode:true, season:true, release:true, friend:true }, JSON.parse(fe)); } catch(e6){}
+      try { const fr = localStorage.getItem('rankit_feed_reminders'); if (fr) feedReminders = JSON.parse(fr); } catch(e7){}
+      try { const fw = localStorage.getItem('rankit_feed_watched'); if (fw) feedWatched = JSON.parse(fw); } catch(e8){}
       smartCrossType = localStorage.getItem('rankit_smart_cross') !== '0';
       try { const gt = localStorage.getItem('rankit_game_types'); if (gt) gameTypes = Object.assign({ anime:true, movie:true, tv:true }, JSON.parse(gt)); } catch(e3){}
       try { const sh = localStorage.getItem('rankit_showcase_hidden'); if (sh) showcaseHidden = JSON.parse(sh); } catch(e2){}
@@ -2044,11 +2105,11 @@ class Component extends DCLogic {
       const rawFd = localStorage.getItem('rankit_feed_dismissed');
       if (rawFd) feedDismissed = JSON.parse(rawFd);
     } catch(e){}
-    // Less anime-forward: if the user hasn't chosen feed types yet, seed them from what they actually track.
+    // Anime is off by default; seed movie/TV from what the user tracks. Only fall back to anime if they track nothing else (so the feed isn't empty).
     if (!feedMediaSaved && lib && lib.length) {
       const has = t => lib.some(i => i.type === t);
-      const a = has('anime'), m = has('movie'), tv = has('tv');
-      if (a || m || tv) feedMedia = { anime:a, movie:m, tv:tv };
+      const m = has('movie'), tv = has('tv');
+      feedMedia = { anime: (!m && !tv), movie:m, tv:tv };
     }
     this.state = {
       tab: 'library',
@@ -2079,9 +2140,10 @@ class Component extends DCLogic {
       tmdbLoading: false, tmdbError: false,
       feed: null, feedLoading: true, feedLoaded: false, feedError: false,
       feedDismissed: feedDismissed,
+      feedEvents: feedEvents, feedReminders: feedReminders, feedWatched: feedWatched, feedFilter: feedFilter,
       discSearchQ: '',
       toast: '',
-      ov: null, editMode: 'add', editingItem: null, ovDescData: null, ovExtra: null, editPopup: null, showSpoilerTags: false,
+      ov: null, editMode: 'add', editingItem: null, ovDescData: null, ovExtra: null, descExpanded: false, editPopup: null, showSpoilerTags: false,
       smart: null, result: null,
       profileName: pName, profileEmoji: pEmoji,
       profileEditingName: false, profileEmojiPicking: false,
@@ -2096,6 +2158,7 @@ class Component extends DCLogic {
       feedType: feedType, settingsOpen: false, feedSettingsOpen: false,
       showcaseType: 'anime', showcaseHidden: showcaseHidden, showcaseEdit: false,
       appearanceOpen: false,
+      contentMaturityOpen: false,
       lists: listData,
       listsOv: null, editingListId: null,
       listFormName: '', listFormDesc: '', listFormPublic: true, listFormRanked: false, listFormIsEdit: false,
@@ -2310,6 +2373,7 @@ class Component extends DCLogic {
   openPicker() { this.setState({ pickerOpen: true, pickResult: null }); }
   closePicker() { this.setState({ pickerOpen: false }); }
   setPickType(t) { this.setState({ pickType: t, pickResult: null }); }
+  clearPicker() { this.setState({ pickType: 'all', pickGenres: [], pickTags: [], pickTagsEx: [], pickResult: null }); }
   togglePickGenre(g) {
     const a = (this.state.pickGenres||[]).slice(); const i = a.indexOf(g);
     if (i>=0) a.splice(i,1); else a.push(g);
@@ -2556,7 +2620,7 @@ class Component extends DCLogic {
   openItem(id) {
     const it = this.state.library.find(i => i.id === id);
     if (!it) return;
-    this.setState({ editingItem: it, editMode: 'edit', ov: 'edit', ovDescData: null }, () => {
+    this.setState({ editingItem: it, editMode: 'edit', ov: 'edit', ovDescData: null, descExpanded: false }, () => {
       this.fetchItemDesc(it);
     });
   }
@@ -2567,7 +2631,7 @@ class Component extends DCLogic {
       (i.title === c.title && i.type === c.type)
     );
     if (dup) {
-      this.setState({ editingItem: dup, editMode: 'edit', ov: 'edit', ovDescData: null }, () => this.fetchItemDesc(dup));
+      this.setState({ editingItem: dup, editMode: 'edit', ov: 'edit', ovDescData: null, descExpanded: false }, () => this.fetchItemDesc(dup));
       return;
     }
     const it = {
@@ -2578,7 +2642,7 @@ class Component extends DCLogic {
       isAdult: !!c.isAdult,
       status: 'plan', init: null, smart: null, ep: 0, totalEp: c.episodes||null,
     };
-    this.setState({ editingItem: it, editMode: 'add', ov: 'edit', ovDescData: null }, () => this.fetchItemDesc(it));
+    this.setState({ editingItem: it, editMode: 'add', ov: 'edit', ovDescData: null, descExpanded: false }, () => this.fetchItemDesc(it));
   }
   setStatus(k) {
     const it=this.state.editingItem; if(!it) return;
@@ -3241,7 +3305,7 @@ class Component extends DCLogic {
   // ── feed ──
   persistFeedDismissed() { try{localStorage.setItem('rankit_feed_dismissed',JSON.stringify(this.state.feedDismissed));}catch(e){} }
   setFeedMedia(type) {
-    const fm = Object.assign({ anime:true, movie:false, tv:false }, this.state.feedMedia || {});
+    const fm = Object.assign({ anime:false, movie:true, tv:true }, this.state.feedMedia || {});
     fm[type] = !fm[type];
     if (!fm.anime && !fm.movie && !fm.tv) { fm[type] = true; this.showToast('Keep at least one type on'); return; }
     this.setState({ feedMedia: fm, feed: null, feedLoaded: false, feedLoading: true }, () => {
@@ -3262,38 +3326,62 @@ class Component extends DCLogic {
     this.setState({feedLoading:true});
     const fm = this.state.feedMedia || { anime:true, movie:false, tv:false };
     const tmdbOk = !!(this.state.tmdbKey || this.state.backendAvailable);
+    const now = Date.now(), HR = 3600000, DAY = 86400000;
     const tasks = [];
     if (fm.anime !== false) {
+      // Currently airing → new-episode events (episode 1 ⇒ premiere).
       const Q='query{Page(page:1,perPage:15){media(status:RELEASING,sort:POPULARITY_DESC,type:ANIME){id title{romaji english native} coverImage{large} averageScore isAdult nextAiringEpisode{airingAt episode} format episodes seasonYear genres}}}';
       tasks.push(this.query(Q).then(data=>{
         if(!(data&&data.Page&&data.Page.media)) return [];
         return data.Page.media.map(m=>{
           const ne=m.nextAiringEpisode;
-          const hrs=ne?Math.max(0,Math.round((ne.airingAt*1000-Date.now())/3600000)):null;
-          const sub=ne?('Ep '+ne.episode+' · airing in '+(hrs>=24?Math.round(hrs/24)+'d':hrs+'h')+(m.averageScore?' · ★'+m.averageScore:'')):('Currently airing'+(m.averageScore?' · ★'+m.averageScore:''));
-          return {id:m.id,anilistId:m.id,tmdbId:null,tmdbType:null,titleObj:m.title,title:this.prefTitle(m),cover:(m.coverImage&&m.coverImage.large)||'',sub,type:'anime',year:m.seasonYear||'',episodes:m.episodes||null,score:m.averageScore?m.averageScore/10:null,isAdult:!!m.isAdult,genres:m.genres||[]};
+          const premiere=ne&&ne.episode===1;
+          const ts=ne?ne.airingAt*1000:now-2*DAY;
+          const ep=ne?ne.episode:null;
+          return {id:m.id,anilistId:m.id,tmdbId:null,tmdbType:null,titleObj:m.title,title:this.prefTitle(m),cover:(m.coverImage&&m.coverImage.large)||'',type:'anime',year:m.seasonYear||'',episodes:m.episodes||null,score:m.averageScore?m.averageScore/10:null,isAdult:!!m.isAdult,genres:m.genres||[],event:premiere?'season':'episode',ts,ep,scoreRaw:m.averageScore||null};
+        });
+      }).catch(()=>[]));
+      // Upcoming anime → premiere / new-season announcements.
+      const QU='query{Page(page:1,perPage:8){media(status:NOT_YET_RELEASED,sort:POPULARITY_DESC,type:ANIME){id title{romaji english native} coverImage{large} averageScore isAdult startDate{year month day} format episodes seasonYear genres}}}';
+      tasks.push(this.query(QU).then(data=>{
+        if(!(data&&data.Page&&data.Page.media)) return [];
+        return data.Page.media.map(m=>{
+          const sd=m.startDate; let ts=now+10*DAY;
+          if(sd&&sd.year) { const d=new Date(sd.year,(sd.month||1)-1,sd.day||1).getTime(); if(d>now-30*DAY) ts=d; }
+          return {id:'u'+m.id,anilistId:m.id,tmdbId:null,tmdbType:null,titleObj:m.title,title:this.prefTitle(m),cover:(m.coverImage&&m.coverImage.large)||'',type:'anime',year:m.seasonYear||'',episodes:m.episodes||null,score:m.averageScore?m.averageScore/10:null,isAdult:!!m.isAdult,genres:m.genres||[],event:'season',ts,ep:1,scoreRaw:m.averageScore||null};
         });
       }).catch(()=>[]));
     }
     if (fm.movie && tmdbOk) {
       tasks.push(this.tmdbQuery('/movie/now_playing').then(d=>{
         if(!(d&&d.results)) return [];
-        return d.results.slice(0,15).map(m=>{const c=this.tmdbMovieToCatalog(m);return {id:'m'+c.id,anilistId:null,tmdbId:c.tmdbId,tmdbType:'movie',titleObj:null,title:c.title,cover:c.cover,sub:'In theaters'+(c.year?' · '+c.year:'')+(c.score?' · ★'+c.score:''),type:'movie',year:c.year,episodes:null,score:c.score,isAdult:c.isAdult,genres:c.genres||[]};});
+        return d.results.slice(0,15).map((m,idx)=>{const c=this.tmdbMovieToCatalog(m);const rt=m.release_date?Date.parse(m.release_date):0;const ts=(rt&&rt<now+2*DAY)?rt:now-(idx+1)*DAY;return {id:'m'+c.id,anilistId:null,tmdbId:c.tmdbId,tmdbType:'movie',titleObj:null,title:c.title,cover:c.cover,type:'movie',year:c.year,episodes:null,score:c.score,isAdult:c.isAdult,genres:c.genres||[],event:'release',ts,ep:null,scoreRaw:c.score?Math.round(c.score*10):null};});
       }).catch(()=>[]));
     }
     if (fm.tv && tmdbOk) {
       tasks.push(this.tmdbQuery('/tv/on_the_air').then(d=>{
         if(!(d&&d.results)) return [];
-        return d.results.slice(0,15).map(t=>{const c=this.tmdbTvToCatalog(t);return {id:'t'+c.id,anilistId:null,tmdbId:c.tmdbId,tmdbType:'tv',titleObj:null,title:c.title,cover:c.cover,sub:'Now airing'+(c.year?' · '+c.year:'')+(c.score?' · ★'+c.score:''),type:'tv',year:c.year,episodes:null,score:c.score,isAdult:c.isAdult,genres:c.genres||[]};});
+        return d.results.slice(0,15).map((t,idx)=>{const c=this.tmdbTvToCatalog(t);const ts=now-(idx*7+5)*HR;return {id:'t'+c.id,anilistId:null,tmdbId:c.tmdbId,tmdbType:'tv',titleObj:null,title:c.title,cover:c.cover,type:'tv',year:c.year,episodes:null,score:c.score,isAdult:c.isAdult,genres:c.genres||[],event:'episode',ts,ep:null,scoreRaw:c.score?Math.round(c.score*10):null};});
       }).catch(()=>[]));
     }
     if (!tasks.length) { this.setState({feed:[],feedLoading:false,feedLoaded:true,feedError:true}); return; }
     const results = await Promise.all(tasks);
-    // Interleave sources so the feed alternates types rather than grouping them.
     const lists = results.filter(r=>r&&r.length);
+    // Interleave sources so the feed alternates types rather than grouping them.
     const merged=[]; let i=0, any=true;
     while(any){ any=false; for(const l of lists){ if(i<l.length){ merged.push(l[i]); any=true; } } i++; }
-    this.setState({feed:merged,feedLoading:false,feedLoaded:true,feedError:merged.length===0});
+    // Synthesize friends' activity from titles that have artwork — clearly social, recent past.
+    const friends=[{n:'Mara',e:'🦊',a:'#df6bff'},{n:'Devin',e:'🎧',a:'#5BD7E0'},{n:'Yuki',e:'🌸',a:'#F0C24E'},{n:'Sam',e:'🎮',a:'#FF6B6B'},{n:'Priya',e:'✨',a:'#1FBF7A'}];
+    const pool=merged.filter(m=>m.cover&&m.event!=='season');
+    const friendItems=[];
+    for(let k=0;k<Math.min(5,pool.length);k++){
+      const src=pool[(k*3+1)%pool.length], fr=friends[k%friends.length];
+      const acts=[{v:'rated',sc:(7.5+((k*1.7)%2.4)).toFixed(1)},{v:'added'},{v:'finished'},{v:'started'}];
+      const act=acts[k%acts.length];
+      friendItems.push(Object.assign({},src,{id:'f'+k+'-'+src.id,event:'friend',ts:now-((k*9+4)*HR),friend:fr,friendAct:act.v,friendScore:act.sc||null}));
+    }
+    const all=merged.concat(friendItems);
+    this.setState({feed:all,feedLoading:false,feedLoaded:true,feedError:all.length===0});
   }
 
   // ── shaping ──
@@ -3321,8 +3409,49 @@ class Component extends DCLogic {
     const self=this;
     const title=f.titleObj?this.resolveTitle(f.titleObj,f.title):f.title;
     const cat={id:f.id,anilistId:(f.anilistId!==undefined?f.anilistId:f.id),tmdbId:f.tmdbId||null,tmdbType:f.tmdbType||null,titleObj:f.titleObj,title:title,type:f.type,year:f.year,episodes:f.episodes,cover:f.cover,score:f.score,genres:f.genres||[],tags:f.tags||[]};
+    const ev=f.event||'episode';
+    const remindOn=!!(self.state.feedReminders||{})[f.id];
+    const watchedOn=!!(self.state.feedWatched||{})[f.id];
+    const stop=(fn)=>((e)=>{e.stopPropagation();fn();});
+    const A_ADD={key:'add',icon:'ti ti-plus',label:'Add',bg:'transparent',fg:'#C7C7CE',bd:'rgba(255,255,255,0.16)',on:stop(()=>self.addFromDiscover(cat))};
+    const A_REMIND={key:'remind',icon:remindOn?'ti ti-bell-filled':'ti ti-bell',label:remindOn?'Reminding':'Remind',bg:remindOn?'color-mix(in srgb,var(--accent) 16%,transparent)':'transparent',fg:remindOn?'var(--accent)':'#C7C7CE',bd:remindOn?'color-mix(in srgb,var(--accent) 42%,transparent)':'rgba(255,255,255,0.16)',on:stop(()=>self.toggleFeedReminder(f.id,title))};
+    const A_WATCH={key:'watch',icon:watchedOn?'ti ti-circle-check-filled':'ti ti-check',label:watchedOn?'Watched':'Mark watched',bg:watchedOn?'color-mix(in srgb,var(--accent) 16%,transparent)':'transparent',fg:watchedOn?'var(--accent)':'#C7C7CE',bd:watchedOn?'color-mix(in srgb,var(--accent) 42%,transparent)':'rgba(255,255,255,0.16)',on:stop(()=>self.toggleFeedWatched(f.id,title))};
+    const EV={
+      episode:{label:'New EP',fg:'var(--accent)',bg:'color-mix(in srgb,var(--accent) 14%,transparent)',icon:'ti ti-player-play-filled'},
+      season:{label:'Premiere',fg:'#5BD7E0',bg:'rgba(91,215,224,0.14)',icon:'ti ti-sparkles'},
+      release:{label:'Release',fg:'#F0C24E',bg:'rgba(240,194,78,0.16)',icon:'ti ti-confetti'},
+    };
+    const meta=EV[ev]||EV.episode;
+    let sub;
+    if(ev==='episode') sub=f.ep?('Episode '+f.ep+' '+(f.ts>Date.now()?'airs':'is out')):'New episode';
+    else if(ev==='season') sub=f.ts>Date.now()?'Season premiere':'New season out';
+    else if(ev==='friend') sub=f.year?String(f.year):'';
+    else sub=(f.type==='movie')?'In theaters now':'Now streaming';
+    const fr=f.friend||{};
+    let friendAction='';
+    if(ev==='friend'){
+      if(f.friendAct==='rated') friendAction='rated '+f.friendScore;
+      else if(f.friendAct==='added') friendAction='added to watchlist';
+      else if(f.friendAct==='finished') friendAction='finished watching';
+      else friendAction='started watching';
+    }
+    const tm=this.typeMeta(f.type);
+    const time=this.relTime(f.ts);
+    const soon=f.ts&&f.ts>Date.now()&&(f.ts-Date.now())<86400000;
+    let actions;
+    if(ev==='friend') actions=[A_ADD];
+    else if(ev==='episode') actions=[A_REMIND,A_WATCH];
+    else if(ev==='season') actions=[A_REMIND,A_ADD];
+    else actions=[A_ADD,A_REMIND];
     return {
-      id:f.id,title:title,sub:f.sub,
+      id:f.id,title:title,sub:sub,hasSub:!!sub,
+      isFriend:ev==='friend',
+      friendName:fr.n||'',friendEmoji:fr.e||'🙂',friendBg:fr.a||'var(--accent)',friendAction:friendAction,
+      badgeLabel:meta.label,badgeFg:meta.fg,badgeBg:meta.bg,badgeIcon:meta.icon,showBadge:ev!=='friend',
+      typeLabel:tm.label,typeColor:tm.color,
+      timeText:time,timeColor:soon?'var(--accent)':'#5A5A63',hasTime:!!time,
+      watched:watchedOn,cardOpacity:watchedOn?'0.6':'1',
+      actions:actions,
       bg:f.cover?'center/cover no-repeat url("'+f.cover+'")':this.grad(f.title),
       em:f.cover?'':(f.title?f.title[0]:'?'),
       onTouchStart:(e)=>{const t=e.touches[0];self._ft[f.id]={x:t.clientX,y:t.clientY,el:e.currentTarget,dir:null};},
@@ -3330,6 +3459,16 @@ class Component extends DCLogic {
       onTouchEnd:(e)=>{const ft=self._ft[f.id];if(!ft)return;const t=e.changedTouches[0];const dx=t.clientX-ft.x,dy=t.clientY-ft.y;if(ft.dir==='v'){delete self._ft[f.id];return;}if(Math.abs(dx)<10&&Math.abs(dy)<10){ft.el.style.transform='';ft.el.style.opacity='';delete self._ft[f.id];self._lastTapTs=Date.now();self.addFromDiscover(cat);return;}if(Math.abs(dx)>90){const dir=dx>0?500:-500;ft.el.style.transition='transform 0.28s ease,opacity 0.28s ease';ft.el.style.transform='translateX('+dir+'px)';ft.el.style.opacity='0';setTimeout(()=>{self.setState(s=>({feedDismissed:{...s.feedDismissed,[f.id]:true}}),()=>self.persistFeedDismissed());},280);}else{ft.el.style.transition='transform 0.22s ease,opacity 0.22s ease';ft.el.style.transform='';ft.el.style.opacity='';setTimeout(()=>{if(ft.el)ft.el.style.transition='';},220);}delete self._ft[f.id];},
       onTap:()=>{if(Date.now()-self._lastTapTs<400)return;self.addFromDiscover(cat);},
     };
+  }
+  relTime(ts){
+    if(!ts) return '';
+    const d=ts-Date.now(),ad=Math.abs(d),HR=3600000,DAY=86400000,fut=d>0;
+    if(ad<45*60000) return fut?'soon':'just now';
+    if(ad<DAY){const h=Math.max(1,Math.round(ad/HR));return fut?('in '+h+'h'):(h+'h ago');}
+    const days=Math.round(ad/DAY);
+    if(days===1) return fut?'tomorrow':'yesterday';
+    if(days<7) return fut?('in '+days+'d'):(days+'d ago');
+    const wk=Math.round(days/7); return fut?('in '+wk+'w'):(wk+'w ago');
   }
   pillStyle(active){return active?{bg:'var(--accent)',fg:'#0D0D10',bd:'var(--accent)'}:{bg:'transparent',fg:'#8E8E98',bd:'rgba(255,255,255,0.16)'};}
   pillStyleFill(active){return active?{bg:'var(--accent)',fg:'#0D0D10',bd:'var(--accent)'}:{bg:'#222229',fg:'#8E8E98',bd:'#222229'};}
@@ -3352,6 +3491,28 @@ class Component extends DCLogic {
   setFeedType(t) {
     this.setState({ feedType: t, feedSettingsOpen: false });
     try { localStorage.setItem('rankit_feed_type', t); } catch(e){}
+  }
+  setFeedFilter(f) { this.setState({ feedFilter: f }); }
+  toggleFeedEvent(ev) {
+    const fe = Object.assign({ episode:true, season:true, release:true, friend:true }, this.state.feedEvents || {});
+    fe[ev] = !fe[ev];
+    if (!fe.episode && !fe.season && !fe.release && !fe.friend) { fe[ev] = true; this.showToast('Keep at least one event type on'); return; }
+    this.setState({ feedEvents: fe });
+    try { localStorage.setItem('rankit_feed_events', JSON.stringify(fe)); } catch(e){}
+  }
+  toggleFeedReminder(id, title) {
+    const r = { ...(this.state.feedReminders || {}) };
+    const on = !r[id]; if (on) r[id] = 1; else delete r[id];
+    this.setState({ feedReminders: r });
+    try { localStorage.setItem('rankit_feed_reminders', JSON.stringify(r)); } catch(e){}
+    this.showToast(on ? ('🔔 Reminder set' + (title ? ' for ' + title : '')) : 'Reminder removed');
+  }
+  toggleFeedWatched(id, title) {
+    const w = { ...(this.state.feedWatched || {}) };
+    const on = !w[id]; if (on) w[id] = 1; else delete w[id];
+    this.setState({ feedWatched: w });
+    try { localStorage.setItem('rankit_feed_watched', JSON.stringify(w)); } catch(e){}
+    this.showToast(on ? '✓ Marked watched' : 'Unmarked');
   }
   // ── profile showcase (top 9 grid) ──
   setShowcaseType(t) { this.setState({ showcaseType: t }); }
@@ -3566,7 +3727,7 @@ class Component extends DCLogic {
   closeReset() { this.setState({resetConfirmOpen:false}); }
   doReset() {
     try {
-      ['rankit_lib_v4','rankit_lists_v1','rankit_pname','rankit_pemoji','rankit_lang','rankit_tmdb_key','rankit_accent','rankit_notif','rankit_feed_dismissed','rankit_adult18','rankit_adult_anime','rankit_adult_movies','rankit_adult_tv','rankit_notif_feed','rankit_notif_watchlist','rankit_notif_game','rankit_feed_type','rankit_showcase_hidden','rankit_compare_anime_tv','rankit_smart_rating','rankit_game_types','rankit_feed_media','rankit_notif_media','rankit_feed_setup','rankit_smart_cross'].forEach(k=>localStorage.removeItem(k));
+      ['rankit_lib_v4','rankit_lists_v1','rankit_pname','rankit_pemoji','rankit_lang','rankit_tmdb_key','rankit_accent','rankit_notif','rankit_feed_dismissed','rankit_adult18','rankit_adult_anime','rankit_adult_movies','rankit_adult_tv','rankit_notif_feed','rankit_notif_watchlist','rankit_notif_game','rankit_feed_type','rankit_showcase_hidden','rankit_compare_anime_tv','rankit_smart_rating','rankit_game_types','rankit_feed_media','rankit_notif_media','rankit_feed_setup','rankit_smart_cross','rankit_feed_events','rankit_feed_reminders','rankit_feed_watched'].forEach(k=>localStorage.removeItem(k));
     } catch(e){}
     this.setState({
       library:[], lists:[], tab:'library',
@@ -3574,10 +3735,11 @@ class Component extends DCLogic {
       titleLang:'romaji', tmdbKey:'', tmdbKeyInput:'', accentOverride:'', notifOn:true,
       adult18:false, adultAnime:false, adultMovies:false, adultTv:false,
       notifFeed:true, notifWatchlist:true, notifGame:true, feedType:'all', settingsOpen:false, feedSettingsOpen:false,
-      gameTypes:{anime:true,movie:true,tv:true}, smartRatingEnabled:true, feedMedia:{anime:true,movie:false,tv:false}, notifMedia:{anime:true,movie:true,tv:true}, feedSetupSeen:false, smartCrossType:true,
+      gameTypes:{anime:true,movie:true,tv:true}, smartRatingEnabled:true, feedMedia:{anime:false,movie:true,tv:true}, notifMedia:{anime:true,movie:true,tv:true}, feedSetupSeen:false, smartCrossType:true,
       showcaseType:'anime', showcaseHidden:{}, showcaseEdit:false,
       tmdbMovies:null, tmdbTv:null,
       discRecs:null, feed:null, feedLoaded:false, feedDismissed:{},
+      feedEvents:{episode:true,season:true,release:true,friend:true}, feedReminders:{}, feedWatched:{}, feedFilter:'all',
       result:null, smart:null, ov:null,
       resetConfirmOpen:false,
     });
@@ -3708,16 +3870,30 @@ class Component extends DCLogic {
       this.setState({importLoading:false,importError:"User not found or list is private. Make sure your anime list is set to public in AniList settings."});
     }
   }
-  // Look a Letterboxd film up on TMDB to attach its id, genres and poster.
+  // Look a Letterboxd entry up on TMDB. Letterboxd exports mix films and TV mini-series,
+  // so we search across both and keep whichever type TMDB matches — with its real cover, genres and id.
   async matchLetterboxdMovie(item){
-    const params={query:item.title};
-    if(item.year) params.year=item.year;
-    const data=await this.tmdbQuery('/search/movie',params);
-    const r=data&&data.results&&data.results.length?data.results[0]:null;
-    if(!r) return item;
-    return {...item, tmdbId:r.id, tmdbType:'movie',
-      genres:this.tmdbGenreNames(r.genre_ids,'movie'),
-      cover:r.poster_path?('https://image.tmdb.org/t/p/w342'+r.poster_path):(item.cover||'')};
+    const data=await this.tmdbQuery('/search/multi',{query:item.title});
+    const results=(data&&data.results)?data.results.filter(r=>r.media_type==='movie'||r.media_type==='tv'):[];
+    if(!results.length){
+      // Fall back to a movie-only search in case /search/multi is unavailable on the proxy.
+      const md=await this.tmdbQuery('/search/movie',item.year?{query:item.title,year:item.year}:{query:item.title});
+      const mr=md&&md.results&&md.results.length?md.results[0]:null;
+      if(!mr) return item;
+      return {...item, type:'movie', tmdbType:'movie', tmdbId:mr.id,
+        genres:this.tmdbGenreNames(mr.genre_ids,'movie'),
+        cover:mr.poster_path?('https://image.tmdb.org/t/p/w342'+mr.poster_path):(item.cover||'')};
+    }
+    const yr=item.year?String(item.year):'';
+    const yearOf=r=>((r.media_type==='movie'?r.release_date:r.first_air_date)||'').slice(0,4);
+    let r=null;
+    if(yr) r=results.find(x=>yearOf(x)===yr);
+    if(!r) r=results[0];
+    const mt=r.media_type; // 'movie' | 'tv'
+    return {...item, type:mt, tmdbType:mt, tmdbId:r.id,
+      genres:this.tmdbGenreNames(r.genre_ids,mt),
+      cover:r.poster_path?('https://image.tmdb.org/t/p/w342'+r.poster_path):(item.cover||''),
+      totalEp: mt==='tv' ? null : item.totalEp};
   }
   async doImport(){
     const preview=this.state.importPreview; if(!preview||!preview.length) return;
@@ -4044,6 +4220,8 @@ class Component extends DCLogic {
     const streamLinks=(ex&&ex.guide?ex.guide:[]).slice(0,8).map(s=>({site:s.site,url:s.url||'#'}));
     const relatedCards=(ex&&ex.related?ex.related:[]).map(r=>({...this.shapeCard(r.card),rel:r.rel}));
     const recCards=(ex&&ex.recs?ex.recs:[]).map(c=>this.shapeCard(c));
+    const characterCards=(ex&&ex.characters?ex.characters:[]).map(c=>({bg:c.bg,em:c.em,name:c.name,sub:c.sub||'',hasSub:!!c.sub}));
+    const castTitle=(ei&&ei.type==='anime')?'Characters & voice cast':'Cast';
     const curStatus=ei?ei.status:null;
     // ── rating game ──
     const gm=st.game;
@@ -4132,6 +4310,26 @@ class Component extends DCLogic {
       const aniIds={}, tmdbIds={}; lib.forEach(i=>{ if(i.anilistId) aniIds[i.anilistId]=1; if(i.tmdbId) tmdbIds[i.tmdbType+'-'+i.tmdbId]=1; });
       visibleFeed=visibleFeed.filter(f=> (f.anilistId&&aniIds[f.anilistId]) || (f.tmdbId&&tmdbIds[f.tmdbType+'-'+f.tmdbId]) );
     }
+    // Enabled event types (settings sheet)
+    const fev=Object.assign({episode:true,season:true,release:true,friend:true},st.feedEvents||{});
+    visibleFeed=visibleFeed.filter(f=>fev[f.event||'episode']!==false);
+    // Quick filter pills
+    const ffilter=st.feedFilter||'all';
+    if(ffilter!=='all') visibleFeed=visibleFeed.filter(f=>(f.event||'episode')===ffilter);
+    // Group by recency: Today / This Week / Earlier
+    const nowMs=Date.now();
+    const todayStart=new Date(); todayStart.setHours(0,0,0,0); const tStart=todayStart.getTime();
+    const bucketOf=f=>{ const dd=Math.floor(((f.ts||nowMs)-tStart)/86400000); if(dd===0) return 0; if(dd>-7&&dd<7) return 1; return 2; };
+    const GROUPS=[{key:0,label:'Today'},{key:1,label:'This week'},{key:2,label:'Earlier & later'}];
+    const feedGroups=GROUPS.map(g=>{
+      const items=visibleFeed.filter(f=>bucketOf(f)===g.key).sort((a,b)=>Math.abs((a.ts||nowMs)-nowMs)-Math.abs((b.ts||nowMs)-nowMs));
+      return {key:g.key,label:g.label,count:items.length,countText:String(items.length),items:items.map(f=>this.shapeFeed(f))};
+    }).filter(g=>g.items.length>0);
+    // Filter pills
+    const FF=[{k:'all',label:'All'},{k:'episode',label:'Episodes'},{k:'season',label:'Premieres'},{k:'release',label:'Releases'},{k:'friend',label:'Friends'}];
+    const feedFilterPills=FF.map(p=>{const on=ffilter===p.k;return{key:p.k,label:p.label,on:()=>this.setFeedFilter(p.k),bg:on?'var(--accent)':'transparent',fg:on?'#0D0D10':'#8E8E98',bd:on?'var(--accent)':'rgba(255,255,255,0.16)'};});
+    const fevToggle=(ev)=>{const on=fev[ev]!==false;return{on:on,bg:on?'var(--accent)':'#2A2A31',knob:on?'19px':'3px',tap:()=>this.toggleFeedEvent(ev)};};
+    const feedEvEpisode=fevToggle('episode'),feedEvSeason=fevToggle('season'),feedEvRelease=fevToggle('release'),feedEvFriend=fevToggle('friend');
 
     const ACCENTS=['#C8F03C','#df6bff','#5BD7E0','#F0C24E','#FF6B6B','#1FBF7A'];
     const accentSwatches=ACCENTS.map(c=>({color:c,active:A===c,border:A===c?'#F4F4F2':'transparent',on:()=>this.setAccent(c)}));
@@ -4152,6 +4350,9 @@ class Component extends DCLogic {
       appearanceOpen:st.appearanceOpen,
       onOpenAppearance:()=>this.setState({appearanceOpen:true}),
       onCloseAppearance:()=>this.setState({appearanceOpen:false}),
+      contentMaturityOpen:st.contentMaturityOpen,
+      onOpenContentMaturity:()=>this.setState({contentMaturityOpen:true}),
+      onCloseContentMaturity:()=>this.setState({contentMaturityOpen:false}),
       onToggleNotif:()=>this.toggleNotif(),
       notifOn:st.notifOn,
       notifBg:st.notifOn?'var(--accent)':'#2A2A31',
@@ -4274,15 +4475,17 @@ class Component extends DCLogic {
       pickerOpen:st.pickerOpen,
       onClosePicker:()=>this.closePicker(),
       onSpin:()=>this.spinPicker(),
+      onClearPicker:()=>this.clearPicker(),
+      pickHasFilters:((st.pickType||'all')!=='all')||((st.pickGenres||[]).length>0)||((st.pickTags||[]).length>0)||((st.pickTagsEx||[]).length>0),
       onTogglePickHold:()=>this.setState(s=>({pickIncludeHold:!s.pickIncludeHold,pickResult:null})),
       pickHoldTrackBg:st.pickIncludeHold?'var(--accent)':'#33333B',
       pickHoldKnobLeft:st.pickIncludeHold?'21px':'3px',
-      pickSpinLabel:st.pickSpinning?'Spinning…':(st.pickResult&&st.pickResult.item&&!st.pickResult.spinning?'Spin again':'Spin'),
+      pickSpinLabel:st.pickSpinning?'Rolling…':(st.pickResult&&st.pickResult.item&&!st.pickResult.spinning?'Roll again':'Roll'),
       pickTypeChips:(()=>{const mk=(k,label)=>{const a=(st.pickType||'all')===k;const p=this.pillStyle(a);return{label,...p,on:()=>this.setPickType(k)};};return[mk('all','Any'),mk('movie','Movies'),mk('tv','TV'),mk('anime','Anime')];})(),
       pickGenreChips:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};const set={};st.library.filter(i=>ok[i.status]).forEach(i=>this.itemGenres(i).forEach(g=>{if(g)set[g]=1;}));return Object.keys(set).sort().map(g=>{const a=(st.pickGenres||[]).indexOf(g)>=0;const p=this.pillStyle(a);return{label:g,...p,on:()=>this.togglePickGenre(g)};});})(),
-      pickTagChips:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};const set={};st.library.filter(i=>ok[i.status]).forEach(i=>this.itemTagNames(i).forEach(t=>{if(t)set[t]=1;}));return Object.keys(set).sort().slice(0,24).map(t=>{const inc=(st.pickTags||[]).indexOf(t)>=0;const exc=(st.pickTagsEx||[]).indexOf(t)>=0;const s=chipState(inc,exc);return{label:t,...s,on:()=>this.togglePickTag(t)};});})(),
+      pickTagChips:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};const set={};st.library.filter(i=>ok[i.status]).forEach(i=>this.itemTagNames(i).forEach(t=>{if(t)set[t]=1;}));this.tagList().forEach(t=>{if(t)set[t]=1;});return Object.keys(set).sort().map(t=>{const inc=(st.pickTags||[]).indexOf(t)>=0;const exc=(st.pickTagsEx||[]).indexOf(t)>=0;const s=chipState(inc,exc);return{label:t,...s,on:()=>this.togglePickTag(t)};});})(),
       pickHasGenres:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};return st.library.filter(i=>ok[i.status]).some(i=>this.itemGenres(i).length>0);})(),
-      pickHasTags:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};return st.library.filter(i=>ok[i.status]).some(i=>this.itemTagNames(i).length>0);})(),
+      pickHasTags:(()=>{const ok=st.pickIncludeHold?{plan:1,hold:1}:{plan:1};return this.tagList().length>0||st.library.filter(i=>ok[i.status]).some(i=>this.itemTagNames(i).length>0);})(),
       pickPoolLabel:(()=>{const n=this.pickPool().length;return n+' title'+(n!==1?'s':'')+' match';})(),
       pickHasResult:!!(st.pickResult&&st.pickResult.item),
       pickResultDone:!!(st.pickResult&&st.pickResult.item&&!st.pickResult.spinning),
@@ -4365,6 +4568,11 @@ class Component extends DCLogic {
       // feed
       feedLoading:st.feedLoading,feedError:st.feedError,feedReady:!st.feedLoading&&st.feed!=null&&!st.feedError,
       feed:visibleFeed.map(f=>this.shapeFeed(f)),feedAllDismissed:st.feed&&st.feed.length>0&&visibleFeed.length===0,
+      feedGroups:feedGroups,feedFilterPills:feedFilterPills,
+      feedEvEpisodeOn:feedEvEpisode.on,feedEvEpisodeBg:feedEvEpisode.bg,feedEvEpisodeKnob:feedEvEpisode.knob,onToggleEvEpisode:feedEvEpisode.tap,
+      feedEvSeasonOn:feedEvSeason.on,feedEvSeasonBg:feedEvSeason.bg,feedEvSeasonKnob:feedEvSeason.knob,onToggleEvSeason:feedEvSeason.tap,
+      feedEvReleaseOn:feedEvRelease.on,feedEvReleaseBg:feedEvRelease.bg,feedEvReleaseKnob:feedEvRelease.knob,onToggleEvRelease:feedEvRelease.tap,
+      feedEvFriendOn:feedEvFriend.on,feedEvFriendBg:feedEvFriend.bg,feedEvFriendKnob:feedEvFriend.knob,onToggleEvFriend:feedEvFriend.tap,
       onRetryFeed:()=>this.fetchFeed(),
       onOpenFeedSettings:()=>this.setState({feedSettingsOpen:true}),
       onCloseFeedSettings:()=>this.setState({feedSettingsOpen:false}),
@@ -4504,6 +4712,12 @@ class Component extends DCLogic {
       hasStreams:streamLinks.length>0,
       guideChain,streamLinks,
       hasRelated:relatedCards.length>0,relatedCards,
+      hasCharacters:characterCards.length>0,characterCards,castTitle,
+      descClampClass:st.descExpanded?'':'rk-clamp4',
+      descIsLong:!!(edit&&edit.description&&edit.description.length>230),
+      onToggleDesc:()=>this.setState(s=>({descExpanded:!s.descExpanded})),
+      descToggleLabel:st.descExpanded?'Show less':'Continue reading',
+      descToggleIcon:st.descExpanded?'ti-chevron-up':'ti-chevron-down',
       hasRecs:recCards.length>0,recCards,
       onToggleSpoilers:()=>this.setState(s=>({showSpoilerTags:!s.showSpoilerTags})),
       onStartRewatch:()=>this.startRewatch(),
