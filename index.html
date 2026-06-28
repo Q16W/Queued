@@ -2126,7 +2126,7 @@ class Component extends DCLogic {
       librarySort: 'rating', listAddType: 'all', listAddSort: 'rating', sortSheet: null,
       discSection: 'anime',
       account: null, authOpen: false, authMode: 'signin', authEmail: '', authPassword: '', authName: '', authError: '', authBusy: false,
-      backendAvailable: false, googleClientId: '', syncStatus: '',
+      backendAvailable: false, backendTmdb: false, googleClientId: '', syncStatus: '',
       discGenres: [], discGenresEx: [], discTags: [], discTagsEx: [], discGenreResults: null, discGenreLoading: false, discGenreError: false, filterSeq: 0,
       tagCollection: null,
       tagCategories: null,
@@ -2182,6 +2182,8 @@ class Component extends DCLogic {
       importUsername: '',
       importDone: false,
       importCount: 0,
+      importUnmatched: 0,
+      importTvCount: 0,
       importMatching: false,
       importMatchTotal: 0,
       importMatchDone: 0,
@@ -2217,7 +2219,7 @@ class Component extends DCLogic {
     try {
       const cfg = await fetch('/api/config').then(r => r.ok ? r.json() : null);
       if (!cfg) return; // no backend (e.g. design preview) → app stays fully local
-      this.setState({ backendAvailable: true, googleClientId: cfg.googleClientId || '' });
+      this.setState({ backendAvailable: true, backendTmdb: !!cfg.tmdbProxy, googleClientId: cfg.googleClientId || '' });
       const meRes = await fetch('/api/auth/me').then(r => r.json()).catch(() => null);
       if (meRes && meRes.user) {
         this.setState({ account: meRes.user });
@@ -3870,38 +3872,70 @@ class Component extends DCLogic {
       this.setState({importLoading:false,importError:"User not found or list is private. Make sure your anime list is set to public in AniList settings."});
     }
   }
-  // Look a Letterboxd entry up on TMDB. Letterboxd exports mix films and TV mini-series,
-  // so we search across both and keep whichever type TMDB matches — with its real cover, genres and id.
+  // Real TMDB availability — backendAvailable can be true while the server has no TMDB key.
+  tmdbAvailable(){ return !!(this.state.tmdbKey || this.state.backendTmdb); }
+  // Look a Letterboxd entry up on TMDB. Letterboxd exports are film-first but include TV/mini-series,
+  // so we search across both, prefer an exact title+year hit, and carry over TMDB's real id/cover/genres.
+  // For TV we also pull the episode count and align watch progress with the TMDB version.
   async matchLetterboxdMovie(item){
+    const norm=s=>(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'').trim();
+    const want=norm(item.title);
+    const yr=item.year?parseInt(item.year,10):null;
+    const titleOf=x=>x.media_type==='movie'?(x.title||x.original_title):(x.name||x.original_name);
+    const yearOf=x=>parseInt(((x.media_type==='movie'?x.release_date:x.first_air_date)||'').slice(0,4),10)||null;
     const data=await this.tmdbQuery('/search/multi',{query:item.title});
-    const results=(data&&data.results)?data.results.filter(r=>r.media_type==='movie'||r.media_type==='tv'):[];
-    if(!results.length){
-      // Fall back to a movie-only search in case /search/multi is unavailable on the proxy.
-      const md=await this.tmdbQuery('/search/movie',item.year?{query:item.title,year:item.year}:{query:item.title});
-      const mr=md&&md.results&&md.results.length?md.results[0]:null;
-      if(!mr) return item;
-      return {...item, type:'movie', tmdbType:'movie', tmdbId:mr.id,
-        genres:this.tmdbGenreNames(mr.genre_ids,'movie'),
-        cover:mr.poster_path?('https://image.tmdb.org/t/p/w342'+mr.poster_path):(item.cover||'')};
-    }
-    const yr=item.year?String(item.year):'';
-    const yearOf=r=>((r.media_type==='movie'?r.release_date:r.first_air_date)||'').slice(0,4);
+    let results=(data&&data.results)?data.results.filter(r=>r.media_type==='movie'||r.media_type==='tv'):[];
     let r=null;
-    if(yr) r=results.find(x=>yearOf(x)===yr);
-    if(!r) r=results[0];
+    if(results.length){
+      // Prefer exact-title matches; within those, prefer the right year; Letterboxd is film-first so break ties toward movies.
+      const exact=results.filter(x=>norm(titleOf(x))===want);
+      const pool=exact.length?exact:results;
+      if(yr){ r=pool.find(x=>yearOf(x)===yr) || pool.find(x=>{const y=yearOf(x);return y&&Math.abs(y-yr)<=1;}); }
+      if(!r){ r=pool.find(x=>x.media_type==='movie') || pool[0]; }
+    }
+    if(!r){
+      // Fall back to a movie-only search in case /search/multi is unavailable on the proxy.
+      const md=await this.tmdbQuery('/search/movie',yr?{query:item.title,year:yr}:{query:item.title});
+      const mr=md&&md.results&&md.results.length?md.results[0]:null;
+      if(!mr) return {...item, unmatched:true};
+      return {...item, type:'movie', tmdbType:'movie', tmdbId:mr.id, unmatched:false,
+        genres:this.tmdbGenreNames(mr.genre_ids,'movie'),
+        score:mr.vote_average?parseFloat(mr.vote_average.toFixed(1)):item.score,
+        cover:mr.poster_path?('https://image.tmdb.org/t/p/w342'+mr.poster_path):(item.cover||''),
+        totalEp:1, ep:item.status==='plan'?0:1};
+    }
     const mt=r.media_type; // 'movie' | 'tv'
-    return {...item, type:mt, tmdbType:mt, tmdbId:r.id,
+    const out={...item, type:mt, tmdbType:mt, tmdbId:r.id, unmatched:false,
       genres:this.tmdbGenreNames(r.genre_ids,mt),
-      cover:r.poster_path?('https://image.tmdb.org/t/p/w342'+r.poster_path):(item.cover||''),
-      totalEp: mt==='tv' ? null : item.totalEp};
+      score:r.vote_average?parseFloat(r.vote_average.toFixed(1)):item.score,
+      year:item.year||(yearOf(r)?String(yearOf(r)):''),
+      cover:r.poster_path?('https://image.tmdb.org/t/p/w342'+r.poster_path):(item.cover||'')};
+    if(mt==='tv'){
+      // Pull the real episode count and map the Letterboxd "watched" state onto TMDB's episodes.
+      const det=await this.tmdbQuery('/tv/'+r.id);
+      const totalEp=(det&&det.number_of_episodes)?det.number_of_episodes:null;
+      out.totalEp=totalEp;
+      if(out.status==='completed') out.ep=totalEp||out.ep;   // finished on Letterboxd ⇒ all episodes watched
+      else if(out.status==='plan') out.ep=0;
+      else out.ep=out.ep||0;
+    } else {
+      out.totalEp=1; out.ep=out.status==='plan'?0:1;
+    }
+    return out;
   }
   async doImport(){
     const preview=this.state.importPreview; if(!preview||!preview.length) return;
     const isAnilist=this.state.importTab==='anilist';
     let items=preview;
-    // Letterboxd films arrive as bare titles — enrich them with TMDB genres + covers before committing.
-    if(!isAnilist && (this.state.tmdbKey||this.state.backendAvailable)){
-      const toMatch=preview.filter(it=>it.type==='movie' && !it.tmdbId && it.title);
+    let matchedCount=0, unmatchedCount=0, tvCount=0;
+    // Letterboxd films arrive as bare titles — enrich them with TMDB id/cover/genres (and TV episode counts) before committing.
+    if(!isAnilist){
+      if(!this.tmdbAvailable()){
+        // No TMDB to match against → don't silently create empty, miscategorised titles.
+        this.setState({importError:'Connect TMDB (Settings → TMDB) to match your Letterboxd films to real titles, covers and episode data. Without it, imports can\u2019t be enriched.'});
+        return;
+      }
+      const toMatch=preview.filter(it=>!it.tmdbId && it.title);
       if(toMatch.length){
         this.setState({importMatching:true, importMatchTotal:toMatch.length, importMatchDone:0});
         const enriched=new Map(); let done=0;
@@ -3909,20 +3943,23 @@ class Component extends DCLogic {
         const worker=async()=>{ while(queue.length){ const it=queue.shift(); let m=it; try{ m=await this.matchLetterboxdMovie(it); }catch(e){} enriched.set(it,m); done++; if(done%3===0||done===toMatch.length) this.setState({importMatchDone:done}); } };
         await Promise.all(Array.from({length:6}, worker));
         items=preview.map(it=>enriched.get(it)||it);
+        items.forEach(it=>{ if(it.tmdbId){ matchedCount++; if(it.type==='tv') tvCount++; } else { unmatchedCount++; } });
         this.setState({importMatching:false});
       }
     }
     const lib=this.state.library;
+    // Drop titles TMDB couldn't resolve — better than committing empty, mis-typed entries.
+    if(!isAnilist) items=items.filter(it=>!!it.tmdbId);
     const newItems=items.filter(it=>{
       if(isAnilist) return !lib.some(l=>l.anilistId&&l.anilistId===it.anilistId);
-      return !lib.some(l=>l.title.toLowerCase()===it.title.toLowerCase()&&l.year===it.year);
+      return !lib.some(l=> (it.tmdbId&&l.tmdbId&&l.tmdbType===it.tmdbType&&l.tmdbId===it.tmdbId) || (l.title.toLowerCase()===it.title.toLowerCase()&&l.year===it.year));
     });
     const count=newItems.length;
     const seeded=newItems.map(it=>{
       if(it.smart!=null && (!it.g||it.g.r==null)) return {...it,g:{r:Math.round(1500+(it.smart-5.5)*170),rd:200,vol:0.06}};
       return it;
     });
-    this.setState({library:[...lib,...seeded],importDone:true,importCount:count,importPreview:null},()=>this.persist());
+    this.setState({library:[...lib,...seeded],importDone:true,importCount:count,importUnmatched:unmatchedCount,importTvCount:tvCount,importPreview:null},()=>this.persist());
   }
 
   // ── lists ──
@@ -4862,8 +4899,11 @@ class Component extends DCLogic {
       importMatchPct: st.importMatchTotal?Math.round((st.importMatchDone||0)/st.importMatchTotal*100):0,
       importDoneLabel: (()=>{
         const c=st.importCount;
-        const skipped=(st.importPreview?0:0);
-        return c+' new title'+(c!==1?'s':'')+' added to your library.';
+        const tv=st.importTvCount||0, un=st.importUnmatched||0;
+        let s=c+' new title'+(c!==1?'s':'')+' added to your library.';
+        if(tv>0) s+=' '+tv+' matched as TV.';
+        if(un>0) s+=' '+un+" couldn't be matched on TMDB and were skipped.";
+        return s;
       })(),
       importBtnLabel: (()=>{
         const p=st.importPreview||[];
